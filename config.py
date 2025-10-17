@@ -9,8 +9,8 @@ class Config:
     
     # Ollama settings
     OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
-    EMBEDDING_MODEL = "nomic-embed-text"
-    CHAT_MODEL = "qwen2.5"
+    EMBEDDING_MODEL = "nomic-embed-text:latest"
+    CHAT_MODEL = "qwen2.5:latest"
     
     # Vector store settings
     VECTOR_DB_PATH = "vector_store.db"

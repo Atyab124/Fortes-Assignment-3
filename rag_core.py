@@ -39,7 +39,13 @@ class RAGSystem:
             
             # Test connection
             models = self.ollama_client.list()
-            available_models = [model['name'] for model in models['models']]
+            # Handle different response formats from Ollama
+            if hasattr(models, 'models'):
+                available_models = [model.model for model in models.models]
+            elif isinstance(models, dict) and 'models' in models:
+                available_models = [model.get('model', model.get('name', '')) for model in models['models']]
+            else:
+                available_models = []
             
             if self.config.EMBEDDING_MODEL not in available_models:
                 logger.warning(f"Embedding model {self.config.EMBEDDING_MODEL} not found")
@@ -152,10 +158,15 @@ class RAGSystem:
                 )
                 
                 # Extract embeddings from response
-                if isinstance(response, dict) and 'embeddings' in response:
+                if hasattr(response, 'embeddings'):
+                    batch_embeddings = response.embeddings
+                elif isinstance(response, dict) and 'embeddings' in response:
                     batch_embeddings = response['embeddings']
-                else:
+                elif isinstance(response, list):
                     batch_embeddings = response
+                else:
+                    # Fallback: try to extract embeddings from the response object
+                    batch_embeddings = getattr(response, 'embeddings', response)
                 
                 embeddings.extend(batch_embeddings)
             
@@ -266,7 +277,15 @@ Context:
                 ]
             )
             
-            return response['message']['content']
+            # Handle different response formats
+            if hasattr(response, 'message') and hasattr(response.message, 'content'):
+                return response.message.content
+            elif isinstance(response, dict) and 'message' in response:
+                return response['message']['content']
+            elif isinstance(response, dict) and 'content' in response:
+                return response['content']
+            else:
+                return str(response)
             
         except Exception as e:
             logger.error(f"Failed to generate answer: {e}")
