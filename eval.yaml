@@ -1,92 +1,70 @@
-# RAG Evaluation Dataset
-# This file contains test cases for evaluating the RAG system
+# RAG System Evaluation Configuration
+# Contains test questions and expected answers for evaluation
 
-- id: 1
-  question: "What is machine learning?"
-  expected_answer: "Machine learning is a subset of artificial intelligence that focuses on the development of algorithms and statistical models that enable computer systems to improve their performance on a specific task through experience, without being explicitly programmed."
-  expected_citations: ["machine_learning_basics.md#1", "machine_learning_basics.md#2"]
-  category: "factual"
+questions:
+  - question: "What is machine learning?"
+    expected_answer: "Machine learning is a subset of artificial intelligence that enables computers to learn and improve from experience without being explicitly programmed."
+    expected_sources: ["machine_learning_basics.md"]
+    
+  - question: "How do neural networks work?"
+    expected_answer: "Neural networks are computing systems inspired by biological neural networks. They consist of interconnected nodes (neurons) that process information through weighted connections."
+    expected_sources: ["neural_networks.txt"]
+    
+  - question: "What are the ethical concerns in AI?"
+    expected_answer: "AI ethics concerns include bias and fairness, privacy and data protection, transparency and explainability, accountability and responsibility, and the impact on employment and society."
+    expected_sources: ["ai_ethics.md"]
+    
+  - question: "Explain the concept of overfitting in machine learning."
+    expected_answer: "Overfitting occurs when a machine learning model learns the training data too well, including its noise and outliers, resulting in poor performance on new, unseen data."
+    expected_sources: ["machine_learning_basics.md"]
+    
+  - question: "What is the difference between supervised and unsupervised learning?"
+    expected_answer: "Supervised learning uses labeled training data to learn a mapping from inputs to outputs, while unsupervised learning finds patterns in data without labeled examples."
+    expected_sources: ["machine_learning_basics.md"]
+    
+  - question: "How does backpropagation work in neural networks?"
+    expected_answer: "Backpropagation is an algorithm that calculates gradients of the loss function with respect to the network's weights by propagating errors backward through the network layers."
+    expected_sources: ["neural_networks.txt"]
+    
+  - question: "What are the main types of bias in AI systems?"
+    expected_answer: "Main types of bias in AI include algorithmic bias, data bias, measurement bias, and selection bias, which can lead to unfair or discriminatory outcomes."
+    expected_sources: ["ai_ethics.md"]
+    
+  - question: "What is gradient descent?"
+    expected_answer: "Gradient descent is an optimization algorithm used to minimize the cost function in machine learning by iteratively adjusting parameters in the direction of steepest descent."
+    expected_sources: ["machine_learning_basics.md"]
+    
+  - question: "How can AI systems be made more transparent?"
+    expected_answer: "AI systems can be made more transparent through explainable AI techniques, clear documentation, interpretable models, and providing reasoning for decisions."
+    expected_sources: ["ai_ethics.md"]
+    
+  - question: "What is a convolutional neural network?"
+    expected_answer: "A convolutional neural network (CNN) is a deep learning architecture particularly effective for image processing, using convolutional layers to detect spatial patterns and features."
+    expected_sources: ["neural_networks.txt"]
+    
+  - question: "What are the challenges of AI regulation?"
+    expected_answer: "AI regulation challenges include keeping pace with rapid technological advances, balancing innovation with safety, addressing global coordination, and defining accountability frameworks."
+    expected_sources: ["ai_ethics.md"]
+    
+  - question: "Explain the concept of regularization in machine learning."
+    expected_answer: "Regularization is a technique used to prevent overfitting by adding a penalty term to the loss function, encouraging simpler models with smaller parameter values."
+    expected_sources: ["machine_learning_basics.md"]
+    
+  - question: "What is transfer learning?"
+    expected_answer: "Transfer learning is a machine learning technique where a model trained on one task is reused as a starting point for a related task, leveraging previously learned features."
+    expected_sources: ["machine_learning_basics.md"]
+    
+  - question: "How do recurrent neural networks process sequential data?"
+    expected_answer: "Recurrent neural networks (RNNs) process sequential data by maintaining hidden states that carry information from previous time steps, allowing them to capture temporal dependencies."
+    expected_sources: ["neural_networks.txt"]
+    
+  - question: "What is the importance of data quality in AI systems?"
+    expected_answer: "Data quality is crucial in AI systems as poor quality data leads to biased models, inaccurate predictions, and unreliable outcomes. High-quality data ensures better model performance and fairness."
+    expected_sources: ["ai_ethics.md", "machine_learning_basics.md"]
 
-- id: 2
-  question: "What are the types of machine learning?"
-  expected_answer: "The main types of machine learning are supervised learning, unsupervised learning, and reinforcement learning."
-  expected_citations: ["machine_learning_basics.md#3", "machine_learning_basics.md#4"]
-  category: "factual"
-
-- id: 3
-  question: "What is supervised learning?"
-  expected_answer: "Supervised learning is a type of machine learning where the algorithm learns from labeled training data to make predictions on new, unseen data."
-  expected_citations: ["machine_learning_basics.md#5"]
-  category: "technical"
-
-- id: 4
-  question: "What is unsupervised learning?"
-  expected_answer: "Unsupervised learning involves finding hidden patterns in data without labeled examples, where the algorithm must discover the underlying structure of the data on its own."
-  expected_citations: ["machine_learning_basics.md#6"]
-  category: "technical"
-
-- id: 5
-  question: "What is reinforcement learning?"
-  expected_answer: "Reinforcement learning is a type of machine learning where an agent learns to make decisions by taking actions in an environment to maximize cumulative reward."
-  expected_citations: ["machine_learning_basics.md#7"]
-  category: "technical"
-
-- id: 6
-  question: "What are neural networks?"
-  expected_answer: "Neural networks are computing systems inspired by biological neural networks that constitute animal brains, learning to perform tasks by considering examples without being explicitly programmed."
-  expected_citations: ["neural_networks.txt#1", "neural_networks.txt#2"]
-  category: "factual"
-
-- id: 7
-  question: "What are the key components of neural networks?"
-  expected_answer: "The key components of neural networks include neurons (nodes), weights, bias, activation function, and layers."
-  expected_citations: ["neural_networks.txt#3", "neural_networks.txt#4"]
-  category: "technical"
-
-- id: 8
-  question: "What are the types of neural networks?"
-  expected_answer: "The main types of neural networks include feedforward neural networks, convolutional neural networks (CNNs), recurrent neural networks (RNNs), LSTM networks, and transformer networks."
-  expected_citations: ["neural_networks.txt#5", "neural_networks.txt#6"]
-  category: "technical"
-
-- id: 9
-  question: "What are the applications of neural networks?"
-  expected_answer: "Neural networks have applications in computer vision, natural language processing, speech recognition, recommendation systems, autonomous vehicles, healthcare, and finance."
-  expected_citations: ["neural_networks.txt#7", "neural_networks.txt#8"]
-  category: "applications"
-
-- id: 10
-  question: "What is AI ethics?"
-  expected_answer: "AI ethics is a field of study that focuses on the moral implications of AI systems and their impact on society, addressing concerns about fairness, transparency, privacy, and accountability."
-  expected_citations: ["ai_ethics.md#1", "ai_ethics.md#2"]
-  category: "ethical"
-
-- id: 11
-  question: "What are the core principles of AI ethics?"
-  expected_answer: "The core principles of AI ethics include fairness and non-discrimination, transparency and explainability, privacy and data protection, accountability and responsibility, and safety and security."
-  expected_citations: ["ai_ethics.md#3", "ai_ethics.md#4"]
-  category: "ethical"
-
-- id: 12
-  question: "What are the main ethical challenges in AI?"
-  expected_answer: "The main ethical challenges in AI include bias and discrimination, privacy concerns, autonomy and human agency, and transparency and interpretability issues."
-  expected_citations: ["ai_ethics.md#5", "ai_ethics.md#6"]
-  category: "ethical"
-
-- id: 13
-  question: "What is overfitting in machine learning?"
-  expected_answer: "Overfitting occurs when a model performs well on training data but poorly on new data, indicating that the model has learned the training data too well and cannot generalize to unseen data."
-  expected_citations: ["machine_learning_basics.md#8"]
-  category: "technical"
-
-- id: 14
-  question: "What is underfitting in machine learning?"
-  expected_answer: "Underfitting occurs when a model is too simple to capture the underlying patterns in the data, resulting in poor performance on both training and test data."
-  expected_citations: ["machine_learning_basics.md#8"]
-  category: "technical"
-
-- id: 15
-  question: "What are the advantages of neural networks?"
-  expected_answer: "The advantages of neural networks include their ability to learn complex patterns in data, adaptability to different types of problems, handling of non-linear relationships, robustness to noise, and ability to generalize to unseen data."
-  expected_citations: ["neural_networks.txt#9"]
-  category: "analytical"
+# Evaluation settings
+settings:
+  similarity_threshold: 0.7
+  top_k: 5
+  max_response_time: 30.0
+  require_sources: true

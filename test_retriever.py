@@ -1,255 +1,384 @@
 """Tests for retrieval functionality."""
 
-import unittest
+import pytest
+import numpy as np
 import tempfile
 import os
-import numpy as np
+from pathlib import Path
 
-from vector_store import VectorStore
-from rag_core import RAGCore
+from vector_store import FAISSVectorStore, VectorStoreManager
+from database import VectorDatabase
 
-class TestRetriever(unittest.TestCase):
-    """Test cases for retrieval functionality."""
+class TestFAISSVectorStore:
+    """Test cases for FAISSVectorStore."""
     
-    def setUp(self):
+    def setup_method(self):
         """Set up test fixtures."""
-        self.temp_dir = tempfile.mkdtemp()
-        self.vector_store = VectorStore()
+        # Use temporary file for testing
+        self.temp_file = tempfile.NamedTemporaryFile(suffix='.bin', delete=False)
+        self.temp_file.close()
         
-        # Create test chunks
-        self.test_chunks = [
-            {
-                "chunk_id": "test_1",
-                "document_id": 1,
-                "chunk_index": 0,
-                "content": "This is about machine learning and artificial intelligence.",
-                "start_char": 0,
-                "end_char": 50,
-                "filename": "test1.md",
-                "file_type": ".md"
-            },
-            {
-                "chunk_id": "test_2",
-                "document_id": 1,
-                "chunk_index": 1,
-                "content": "Deep learning is a subset of machine learning.",
-                "start_char": 51,
-                "end_char": 100,
-                "filename": "test1.md",
-                "file_type": ".md"
-            },
-            {
-                "chunk_id": "test_3",
-                "document_id": 2,
-                "chunk_index": 0,
-                "content": "Natural language processing uses neural networks.",
-                "start_char": 0,
-                "end_char": 50,
-                "filename": "test2.md",
-                "file_type": ".md"
-            }
-        ]
+        self.vector_store = FAISSVectorStore(
+            dimension=4,  # Small dimension for testing
+            index_path=self.temp_file.name
+        )
     
-    def tearDown(self):
+    def teardown_method(self):
         """Clean up test fixtures."""
-        import shutil
-        shutil.rmtree(self.temp_dir)
-        self.vector_store.clear()
+        if os.path.exists(self.temp_file.name):
+            os.unlink(self.temp_file.name)
+        if os.path.exists(self.temp_file.name.replace('.bin', '_metadata.pkl')):
+            os.unlink(self.temp_file.name.replace('.bin', '_metadata.pkl'))
     
-    def test_add_chunks(self):
-        """Test adding chunks to vector store."""
-        embedding_ids = self.vector_store.add_chunks(self.test_chunks)
+    def test_add_vectors(self):
+        """Test adding vectors to the store."""
+        vectors = [
+            [1.0, 0.0, 0.0, 0.0],
+            [0.0, 1.0, 0.0, 0.0],
+            [0.0, 0.0, 1.0, 0.0]
+        ]
         
-        self.assertEqual(len(embedding_ids), len(self.test_chunks))
-        self.assertTrue(all(embedding_id for embedding_id in embedding_ids))
+        metadata = [
+            {'id': 1, 'content': 'First document'},
+            {'id': 2, 'content': 'Second document'},
+            {'id': 3, 'content': 'Third document'}
+        ]
+        
+        faiss_ids = self.vector_store.add_vectors(vectors, metadata)
+        
+        assert len(faiss_ids) == 3
+        assert self.vector_store.index.ntotal == 3
     
-    def test_search_basic(self):
-        """Test basic search functionality."""
-        # Add chunks
-        self.vector_store.add_chunks(self.test_chunks)
+    def test_search_vectors(self):
+        """Test searching for similar vectors."""
+        # Add test vectors
+        vectors = [
+            [1.0, 0.0, 0.0, 0.0],
+            [0.0, 1.0, 0.0, 0.0],
+            [0.0, 0.0, 1.0, 0.0]
+        ]
         
-        # Search
-        results = self.vector_store.search("machine learning", top_k=2)
+        metadata = [
+            {'id': 1, 'content': 'First document'},
+            {'id': 2, 'content': 'Second document'},
+            {'id': 3, 'content': 'Third document'}
+        ]
         
-        self.assertGreater(len(results), 0)
-        self.assertLessEqual(len(results), 2)
+        self.vector_store.add_vectors(vectors, metadata)
         
-        # Check result structure
-        for result in results:
-            self.assertIn("content", result)
-            self.assertIn("similarity_score", result)
-            self.assertIn("chunk_id", result)
-            self.assertGreaterEqual(result["similarity_score"], 0.0)
-            self.assertLessEqual(result["similarity_score"], 1.0)
+        # Search for similar vector
+        query_vector = [0.9, 0.1, 0.0, 0.0]  # Similar to first vector
+        results = self.vector_store.search(query_vector, k=2)
+        
+        assert len(results) > 0
+        assert results[0]['id'] == 1  # Should find the first document
+        assert results[0]['similarity'] > 0.5
     
-    def test_search_with_threshold(self):
-        """Test search with similarity threshold."""
-        # Add chunks
-        self.vector_store.add_chunks(self.test_chunks)
+    def test_search_empty_index(self):
+        """Test searching in empty index."""
+        query_vector = [1.0, 0.0, 0.0, 0.0]
+        results = self.vector_store.search(query_vector, k=5)
+        
+        assert len(results) == 0
+    
+    def test_similarity_threshold(self):
+        """Test similarity threshold filtering."""
+        # Add test vectors
+        vectors = [
+            [1.0, 0.0, 0.0, 0.0],
+            [0.0, 1.0, 0.0, 0.0]
+        ]
+        
+        metadata = [
+            {'id': 1, 'content': 'First document'},
+            {'id': 2, 'content': 'Second document'}
+        ]
+        
+        self.vector_store.add_vectors(vectors, metadata)
         
         # Search with high threshold
-        results = self.vector_store.search_with_threshold("machine learning", threshold=0.9, top_k=5)
+        query_vector = [0.1, 0.0, 0.0, 0.0]  # Low similarity to first vector
+        results = self.vector_store.search(query_vector, k=5, similarity_threshold=0.9)
         
-        # Should return fewer results with high threshold
-        self.assertLessEqual(len(results), len(self.test_chunks))
-        
-        # All results should meet threshold
-        for result in results:
-            self.assertGreaterEqual(result["similarity_score"], 0.9)
+        assert len(results) == 0  # Should return no results due to high threshold
     
-    def test_search_empty_query(self):
-        """Test search with empty query."""
-        self.vector_store.add_chunks(self.test_chunks)
+    def test_get_vector_by_id(self):
+        """Test retrieving vector by ID."""
+        vectors = [[1.0, 0.0, 0.0, 0.0]]
+        metadata = [{'id': 1, 'content': 'Test document'}]
         
-        results = self.vector_store.search("")
-        self.assertEqual(len(results), 0)
-    
-    def test_search_no_chunks(self):
-        """Test search when no chunks are added."""
-        results = self.vector_store.search("test query")
-        self.assertEqual(len(results), 0)
-    
-    def test_get_chunk_by_id(self):
-        """Test getting chunk by embedding ID."""
-        embedding_ids = self.vector_store.add_chunks(self.test_chunks)
+        faiss_ids = self.vector_store.add_vectors(vectors, metadata)
         
-        # Get chunk by ID
-        chunk = self.vector_store.get_chunk_by_id(embedding_ids[0])
-        
-        self.assertIsNotNone(chunk)
-        self.assertEqual(chunk["chunk_id"], self.test_chunks[0]["chunk_id"])
-        self.assertEqual(chunk["content"], self.test_chunks[0]["content"])
+        retrieved_vector = self.vector_store.get_vector_by_id(faiss_ids[0])
+        assert retrieved_vector is not None
+        assert len(retrieved_vector) == 4
     
-    def test_get_chunk_by_nonexistent_id(self):
-        """Test getting chunk by non-existent ID."""
-        chunk = self.vector_store.get_chunk_by_id("nonexistent_id")
-        self.assertIsNone(chunk)
+    def test_get_metadata_by_id(self):
+        """Test retrieving metadata by ID."""
+        vectors = [[1.0, 0.0, 0.0, 0.0]]
+        metadata = [{'id': 1, 'content': 'Test document'}]
+        
+        faiss_ids = self.vector_store.add_vectors(vectors, metadata)
+        
+        retrieved_metadata = self.vector_store.get_metadata_by_id(faiss_ids[0])
+        assert retrieved_metadata is not None
+        assert retrieved_metadata['id'] == 1
+        assert retrieved_metadata['content'] == 'Test document'
+    
+    def test_remove_vectors(self):
+        """Test removing vectors."""
+        vectors = [
+            [1.0, 0.0, 0.0, 0.0],
+            [0.0, 1.0, 0.0, 0.0]
+        ]
+        
+        metadata = [
+            {'id': 1, 'content': 'First document'},
+            {'id': 2, 'content': 'Second document'}
+        ]
+        
+        faiss_ids = self.vector_store.add_vectors(vectors, metadata)
+        
+        # Remove first vector
+        self.vector_store.remove_vectors([faiss_ids[0]])
+        
+        assert self.vector_store.index.ntotal == 1
+        
+        # Verify remaining vector is the second one
+        remaining_metadata = self.vector_store.get_metadata_by_id(0)
+        assert remaining_metadata['id'] == 2
+    
+    def test_save_and_load_index(self):
+        """Test saving and loading index."""
+        # Add some vectors
+        vectors = [[1.0, 0.0, 0.0, 0.0]]
+        metadata = [{'id': 1, 'content': 'Test document'}]
+        
+        self.vector_store.add_vectors(vectors, metadata)
+        self.vector_store.save_index()
+        
+        # Create new vector store and load index
+        new_vector_store = FAISSVectorStore(
+            dimension=4,
+            index_path=self.temp_file.name
+        )
+        
+        assert new_vector_store.index.ntotal == 1
+        assert len(new_vector_store.chunk_metadata) == 1
     
     def test_get_stats(self):
-        """Test getting vector store statistics."""
-        initial_stats = self.vector_store.get_stats()
-        self.assertEqual(initial_stats["total_chunks"], 0)
-        
-        # Add chunks
-        self.vector_store.add_chunks(self.test_chunks)
-        
+        """Test getting index statistics."""
         stats = self.vector_store.get_stats()
-        self.assertEqual(stats["total_chunks"], len(self.test_chunks))
-        self.assertGreater(stats["index_size"], 0)
+        
+        assert 'total_vectors' in stats
+        assert 'dimension' in stats
+        assert 'index_type' in stats
+        assert 'metadata_entries' in stats
+        
+        assert stats['dimension'] == 4
+        assert stats['total_vectors'] == 0  # Initially empty
     
-    def test_clear(self):
-        """Test clearing vector store."""
-        # Add chunks
-        self.vector_store.add_chunks(self.test_chunks)
+    def test_clear_index(self):
+        """Test clearing the index."""
+        # Add some vectors
+        vectors = [[1.0, 0.0, 0.0, 0.0]]
+        metadata = [{'id': 1, 'content': 'Test document'}]
         
-        # Verify chunks are added
-        stats = self.vector_store.get_stats()
-        self.assertGreater(stats["total_chunks"], 0)
+        self.vector_store.add_vectors(vectors, metadata)
+        assert self.vector_store.index.ntotal == 1
         
-        # Clear
-        self.vector_store.clear()
-        
-        # Verify chunks are removed
-        stats = self.vector_store.get_stats()
-        self.assertEqual(stats["total_chunks"], 0)
-    
-    def test_rebuild_index(self):
-        """Test rebuilding index."""
-        # Add chunks
-        self.vector_store.add_chunks(self.test_chunks)
-        
-        # Rebuild index
-        self.vector_store.rebuild_index()
-        
-        # Verify search still works
-        results = self.vector_store.search("machine learning")
-        self.assertGreater(len(results), 0)
-    
-    def test_search_similarity_ordering(self):
-        """Test that search results are ordered by similarity."""
-        # Add chunks
-        self.vector_store.add_chunks(self.test_chunks)
-        
-        # Search
-        results = self.vector_store.search("machine learning", top_k=3)
-        
-        # Results should be ordered by similarity (descending)
-        for i in range(1, len(results)):
-            self.assertGreaterEqual(
-                results[i-1]["similarity_score"],
-                results[i]["similarity_score"]
-            )
-    
-    def test_search_multiple_queries(self):
-        """Test multiple searches."""
-        # Add chunks
-        self.vector_store.add_chunks(self.test_chunks)
-        
-        # Multiple searches
-        queries = ["machine learning", "deep learning", "neural networks"]
-        
-        for query in queries:
-            results = self.vector_store.search(query, top_k=2)
-            self.assertLessEqual(len(results), 2)
-            
-            # Each result should have required fields
-            for result in results:
-                self.assertIn("content", result)
-                self.assertIn("similarity_score", result)
-                self.assertIn("chunk_id", result)
-    
-    def test_chunk_metadata_preservation(self):
-        """Test that chunk metadata is preserved."""
-        # Add chunks
-        embedding_ids = self.vector_store.add_chunks(self.test_chunks)
-        
-        # Search and verify metadata
-        results = self.vector_store.search("machine learning")
-        
-        for result in results:
-            self.assertIn("chunk_id", result)
-            self.assertIn("document_id", result)
-            self.assertIn("filename", result)
-            self.assertIn("file_type", result)
-            self.assertIn("start_char", result)
-            self.assertIn("end_char", result)
-    
-    def test_embedding_consistency(self):
-        """Test that embeddings are consistent."""
-        # Add chunks
-        self.vector_store.add_chunks(self.test_chunks)
-        
-        # Search multiple times with same query
-        query = "machine learning"
-        results1 = self.vector_store.search(query)
-        results2 = self.vector_store.search(query)
-        
-        # Results should be identical
-        self.assertEqual(len(results1), len(results2))
-        
-        for r1, r2 in zip(results1, results2):
-            self.assertEqual(r1["chunk_id"], r2["chunk_id"])
-            self.assertAlmostEqual(r1["similarity_score"], r2["similarity_score"], places=5)
-    
-    def test_large_chunk_handling(self):
-        """Test handling of large chunks."""
-        large_chunk = {
-            "chunk_id": "large_1",
-            "document_id": 1,
-            "chunk_index": 0,
-            "content": "This is a very long chunk. " * 100,  # Very long content
-            "start_char": 0,
-            "end_char": 2500,
-            "filename": "large.md",
-            "file_type": ".md"
-        }
-        
-        embedding_ids = self.vector_store.add_chunks([large_chunk])
-        self.assertEqual(len(embedding_ids), 1)
-        
-        # Search should still work
-        results = self.vector_store.search("long chunk")
-        self.assertGreater(len(results), 0)
+        # Clear index
+        self.vector_store.clear_index()
+        assert self.vector_store.index.ntotal == 0
+        assert len(self.vector_store.chunk_metadata) == 0
 
-if __name__ == '__main__':
-    unittest.main()
+class TestVectorDatabase:
+    """Test cases for VectorDatabase."""
+    
+    def setup_method(self):
+        """Set up test fixtures."""
+        self.temp_db = tempfile.NamedTemporaryFile(suffix='.db', delete=False)
+        self.temp_db.close()
+        
+        self.db = VectorDatabase(self.temp_db.name)
+    
+    def teardown_method(self):
+        """Clean up test fixtures."""
+        if os.path.exists(self.temp_db.name):
+            os.unlink(self.temp_db.name)
+    
+    def test_add_document(self):
+        """Test adding a document."""
+        doc_id = self.db.add_document(
+            filename="test.txt",
+            file_path="/path/to/test.txt",
+            file_type=".txt",
+            file_size=1024,
+            metadata={"author": "test"}
+        )
+        
+        assert doc_id is not None
+        assert doc_id > 0
+    
+    def test_get_document(self):
+        """Test retrieving a document."""
+        doc_id = self.db.add_document(
+            filename="test.txt",
+            file_path="/path/to/test.txt",
+            file_type=".txt",
+            file_size=1024
+        )
+        
+        document = self.db.get_document(doc_id)
+        assert document is not None
+        assert document['filename'] == "test.txt"
+        assert document['file_type'] == ".txt"
+    
+    def test_add_chunks(self):
+        """Test adding chunks."""
+        doc_id = self.db.add_document(
+            filename="test.txt",
+            file_path="/path/to/test.txt",
+            file_type=".txt",
+            file_size=1024
+        )
+        
+        chunks = [
+            {
+                'index': 0,
+                'content': 'First chunk',
+                'start_line': 1,
+                'end_line': 5,
+                'metadata': {'word_count': 2}
+            },
+            {
+                'index': 1,
+                'content': 'Second chunk',
+                'start_line': 6,
+                'end_line': 10,
+                'metadata': {'word_count': 2}
+            }
+        ]
+        
+        chunk_ids = self.db.add_chunks(doc_id, chunks)
+        
+        assert len(chunk_ids) == 2
+        assert all(cid > 0 for cid in chunk_ids)
+    
+    def test_get_chunks_by_document(self):
+        """Test retrieving chunks for a document."""
+        doc_id = self.db.add_document(
+            filename="test.txt",
+            file_path="/path/to/test.txt",
+            file_type=".txt",
+            file_size=1024
+        )
+        
+        chunks = [
+            {
+                'index': 0,
+                'content': 'First chunk',
+                'start_line': 1,
+                'end_line': 5
+            }
+        ]
+        
+        self.db.add_chunks(doc_id, chunks)
+        retrieved_chunks = self.db.get_chunks_by_document(doc_id)
+        
+        assert len(retrieved_chunks) == 1
+        assert retrieved_chunks[0]['content'] == 'First chunk'
+    
+    def test_add_embeddings(self):
+        """Test adding embeddings."""
+        doc_id = self.db.add_document(
+            filename="test.txt",
+            file_path="/path/to/test.txt",
+            file_type=".txt",
+            file_size=1024
+        )
+        
+        chunks = [{'index': 0, 'content': 'Test chunk'}]
+        chunk_ids = self.db.add_chunks(doc_id, chunks)
+        
+        embeddings = [[0.1, 0.2, 0.3, 0.4]]
+        self.db.add_embeddings(chunk_ids, embeddings)
+        
+        # Verify embeddings were added
+        chunks_with_embeddings = self.db.get_all_chunks_with_embeddings()
+        assert len(chunks_with_embeddings) == 1
+        assert chunks_with_embeddings[0]['vector_data'] is not None
+    
+    def test_search_similar_chunks(self):
+        """Test searching for similar chunks."""
+        doc_id = self.db.add_document(
+            filename="test.txt",
+            file_path="/path/to/test.txt",
+            file_type=".txt",
+            file_size=1024
+        )
+        
+        chunks = [
+            {'index': 0, 'content': 'First chunk'},
+            {'index': 1, 'content': 'Second chunk'}
+        ]
+        chunk_ids = self.db.add_chunks(doc_id, chunks)
+        
+        # Add embeddings (similar vectors)
+        embeddings = [
+            [1.0, 0.0, 0.0, 0.0],
+            [0.0, 1.0, 0.0, 0.0]
+        ]
+        self.db.add_embeddings(chunk_ids, embeddings)
+        
+        # Search for similar chunks
+        query_embedding = [0.9, 0.1, 0.0, 0.0]  # Similar to first embedding
+        results = self.db.search_similar_chunks(query_embedding, top_k=2)
+        
+        assert len(results) > 0
+        assert results[0]['similarity'] > 0.5
+    
+    def test_get_document_stats(self):
+        """Test getting document statistics."""
+        # Add some test data
+        doc_id = self.db.add_document(
+            filename="test.txt",
+            file_path="/path/to/test.txt",
+            file_type=".txt",
+            file_size=1024
+        )
+        
+        chunks = [{'index': 0, 'content': 'Test chunk'}]
+        chunk_ids = self.db.add_chunks(doc_id, chunks)
+        self.db.add_embeddings(chunk_ids, [[0.1, 0.2, 0.3, 0.4]])
+        
+        stats = self.db.get_document_stats()
+        
+        assert stats['documents'] == 1
+        assert stats['chunks'] == 1
+        assert stats['embeddings'] == 1
+        assert '.txt' in stats['file_types']
+    
+    def test_clear_database(self):
+        """Test clearing the database."""
+        # Add some test data
+        doc_id = self.db.add_document(
+            filename="test.txt",
+            file_path="/path/to/test.txt",
+            file_type=".txt",
+            file_size=1024
+        )
+        
+        chunks = [{'index': 0, 'content': 'Test chunk'}]
+        self.db.add_chunks(doc_id, chunks)
+        
+        # Clear database
+        self.db.clear_database()
+        
+        stats = self.db.get_document_stats()
+        assert stats['documents'] == 0
+        assert stats['chunks'] == 0
+        assert stats['embeddings'] == 0
+
+if __name__ == "__main__":
+    pytest.main([__file__])

@@ -1,345 +1,439 @@
-"""Observability and logging for the RAG application."""
+"""Observability and monitoring for the RAG system."""
 
-import json
+import logging
 import time
-import hashlib
-from datetime import datetime
-from typing import Dict, Any, List, Optional
-from pathlib import Path
-from loguru import logger
+import json
+from typing import Dict, Any, Optional, List
+from datetime import datetime, timedelta
 from dataclasses import dataclass, asdict
+from pathlib import Path
+import sqlite3
+from contextlib import contextmanager
 
-from config import Config
-
-@dataclass
-class LogEntry:
-    """Log entry structure."""
-    timestamp: str
-    level: str
-    component: str
-    message: str
-    metadata: Dict[str, Any]
-    query_id: Optional[str] = None
+logger = logging.getLogger(__name__)
 
 @dataclass
-class CostEntry:
-    """Cost tracking entry."""
-    timestamp: str
+class QueryMetrics:
+    """Metrics for a single query."""
     query_id: str
-    model_name: str
-    input_tokens: int
-    output_tokens: int
-    total_tokens: int
-    input_cost: float
-    output_cost: float
-    total_cost: float
+    timestamp: datetime
+    query_text: str
+    response_time: float
+    retrieval_time: float
+    generation_time: float
+    num_sources_retrieved: int
+    max_similarity_score: float
+    avg_similarity_score: float
+    answer_length: int
+    token_count: int
+    success: bool
+    error_message: Optional[str] = None
 
 @dataclass
-class PerformanceEntry:
-    """Performance tracking entry."""
-    timestamp: str
-    query_id: str
-    component: str
-    operation: str
-    duration_ms: float
-    metadata: Dict[str, Any]
+class SystemMetrics:
+    """System-level metrics."""
+    timestamp: datetime
+    total_queries: int
+    successful_queries: int
+    failed_queries: int
+    avg_response_time: float
+    total_documents: int
+    total_chunks: int
+    total_embeddings: int
+    memory_usage_mb: float
+    cpu_usage_percent: float
 
-class ObservabilityManager:
-    """Manages logging, cost tracking, and performance monitoring."""
+class MetricsCollector:
+    """Collects and stores system metrics."""
     
-    def __init__(self, log_file: str = None, enable_cost_tracking: bool = None):
-        self.log_file = log_file or Config.LOG_FILE
-        self.enable_cost_tracking = enable_cost_tracking if enable_cost_tracking is not None else Config.ENABLE_COST_TRACKING
-        
-        # Initialize logger
-        self._setup_logger()
-        
-        # Cost tracking
-        self.cost_entries: List[CostEntry] = []
-        self.total_cost = 0.0
-        
-        # Performance tracking
-        self.performance_entries: List[PerformanceEntry] = []
-        
-        # Query cache for cost tracking
-        self.query_cache = {}
-        
-        # Create logs directory
-        Path(self.log_file).parent.mkdir(parents=True, exist_ok=True)
+    def __init__(self, db_path: str = "metrics.db"):
+        """Initialize metrics collector."""
+        self.db_path = db_path
+        self._init_database()
     
-    def _setup_logger(self):
-        """Setup loguru logger with file and console output."""
-        # Remove default handler
-        logger.remove()
-        
-        # Add console handler
-        logger.add(
-            lambda msg: print(msg, end=""),
-            level=Config.LOG_LEVEL,
-            format="<green>{time:YYYY-MM-DD HH:mm:ss}</green> | <level>{level: <8}</level> | <cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - <level>{message}</level>"
-        )
-        
-        # Add file handler
-        logger.add(
-            self.log_file,
-            level=Config.LOG_LEVEL,
-            format="{time:YYYY-MM-DD HH:mm:ss} | {level: <8} | {name}:{function}:{line} - {message}",
-            rotation="10 MB",
-            retention="7 days"
-        )
+    def _init_database(self):
+        """Initialize metrics database."""
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.cursor()
+            
+            # Query metrics table
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS query_metrics (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    query_id TEXT NOT NULL,
+                    timestamp TIMESTAMP NOT NULL,
+                    query_text TEXT,
+                    response_time REAL,
+                    retrieval_time REAL,
+                    generation_time REAL,
+                    num_sources_retrieved INTEGER,
+                    max_similarity_score REAL,
+                    avg_similarity_score REAL,
+                    answer_length INTEGER,
+                    token_count INTEGER,
+                    success BOOLEAN,
+                    error_message TEXT
+                )
+            """)
+            
+            # System metrics table
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS system_metrics (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    timestamp TIMESTAMP NOT NULL,
+                    total_queries INTEGER,
+                    successful_queries INTEGER,
+                    failed_queries INTEGER,
+                    avg_response_time REAL,
+                    total_documents INTEGER,
+                    total_chunks INTEGER,
+                    total_embeddings INTEGER,
+                    memory_usage_mb REAL,
+                    cpu_usage_percent REAL
+                )
+            """)
+            
+            # Performance logs table
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS performance_logs (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    timestamp TIMESTAMP NOT NULL,
+                    operation TEXT NOT NULL,
+                    duration REAL,
+                    success BOOLEAN,
+                    metadata TEXT
+                )
+            """)
+            
+            conn.commit()
     
-    def log_info(self, message: str, component: str = "system", metadata: Dict[str, Any] = None, query_id: str = None):
-        """Log info message."""
-        entry = LogEntry(
-            timestamp=datetime.utcnow().isoformat(),
-            level="INFO",
-            component=component,
-            message=message,
-            metadata=metadata or {},
-            query_id=query_id
-        )
-        logger.info(f"[{component}] {message}", extra=entry.__dict__)
+    def record_query(self, metrics: QueryMetrics):
+        """Record query metrics."""
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                INSERT INTO query_metrics (
+                    query_id, timestamp, query_text, response_time, retrieval_time,
+                    generation_time, num_sources_retrieved, max_similarity_score,
+                    avg_similarity_score, answer_length, token_count, success, error_message
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                metrics.query_id,
+                metrics.timestamp.isoformat(),
+                metrics.query_text,
+                metrics.response_time,
+                metrics.retrieval_time,
+                metrics.generation_time,
+                metrics.num_sources_retrieved,
+                metrics.max_similarity_score,
+                metrics.avg_similarity_score,
+                metrics.answer_length,
+                metrics.token_count,
+                metrics.success,
+                metrics.error_message
+            ))
+            conn.commit()
     
-    def log_warning(self, message: str, component: str = "system", metadata: Dict[str, Any] = None, query_id: str = None):
-        """Log warning message."""
-        entry = LogEntry(
-            timestamp=datetime.utcnow().isoformat(),
-            level="WARNING",
-            component=component,
-            message=message,
-            metadata=metadata or {},
-            query_id=query_id
-        )
-        logger.warning(f"[{component}] {message}", extra=entry.__dict__)
+    def record_system_metrics(self, metrics: SystemMetrics):
+        """Record system metrics."""
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                INSERT INTO system_metrics (
+                    timestamp, total_queries, successful_queries, failed_queries,
+                    avg_response_time, total_documents, total_chunks, total_embeddings,
+                    memory_usage_mb, cpu_usage_percent
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                metrics.timestamp.isoformat(),
+                metrics.total_queries,
+                metrics.successful_queries,
+                metrics.failed_queries,
+                metrics.avg_response_time,
+                metrics.total_documents,
+                metrics.total_chunks,
+                metrics.total_embeddings,
+                metrics.memory_usage_mb,
+                metrics.cpu_usage_percent
+            ))
+            conn.commit()
     
-    def log_error(self, message: str, component: str = "system", metadata: Dict[str, Any] = None, query_id: str = None):
-        """Log error message."""
-        entry = LogEntry(
-            timestamp=datetime.utcnow().isoformat(),
-            level="ERROR",
-            component=component,
-            message=message,
-            metadata=metadata or {},
-            query_id=query_id
-        )
-        logger.error(f"[{component}] {message}", extra=entry.__dict__)
+    def record_performance_log(self, operation: str, duration: float, 
+                             success: bool, metadata: Optional[Dict] = None):
+        """Record performance log."""
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                INSERT INTO performance_logs (timestamp, operation, duration, success, metadata)
+                VALUES (?, ?, ?, ?, ?)
+            """, (
+                datetime.now().isoformat(),
+                operation,
+                duration,
+                success,
+                json.dumps(metadata) if metadata else None
+            ))
+            conn.commit()
     
-    def log_debug(self, message: str, component: str = "system", metadata: Dict[str, Any] = None, query_id: str = None):
-        """Log debug message."""
-        entry = LogEntry(
-            timestamp=datetime.utcnow().isoformat(),
-            level="DEBUG",
-            component=component,
-            message=message,
-            metadata=metadata or {},
-            query_id=query_id
-        )
-        logger.debug(f"[{component}] {message}", extra=entry.__dict__)
-    
-    def track_cost(self, query_id: str, model_name: str, input_tokens: int, 
-                   output_tokens: int, input_cost: float = None, output_cost: float = None):
-        """Track cost for a query."""
-        if not self.enable_cost_tracking:
-            return
+    def get_query_stats(self, hours: int = 24) -> Dict[str, Any]:
+        """Get query statistics for the last N hours."""
+        since_time = datetime.now() - timedelta(hours=hours)
         
-        # Get costs from config if not provided
-        if input_cost is None or output_cost is None:
-            model_costs = Config.get_model_costs().get(model_name, {"input": 0.0, "output": 0.0})
-            input_cost = input_cost or (input_tokens * model_costs["input"] / 1000)
-            output_cost = output_cost or (output_tokens * model_costs["output"] / 1000)
-        
-        total_tokens = input_tokens + output_tokens
-        total_cost = input_cost + output_cost
-        
-        entry = CostEntry(
-            timestamp=datetime.utcnow().isoformat(),
-            query_id=query_id,
-            model_name=model_name,
-            input_tokens=input_tokens,
-            output_tokens=output_tokens,
-            total_tokens=total_tokens,
-            input_cost=input_cost,
-            output_cost=output_cost,
-            total_cost=total_cost
-        )
-        
-        self.cost_entries.append(entry)
-        self.total_cost += total_cost
-        
-        self.log_info(
-            f"Cost tracked: ${total_cost:.4f} for {total_tokens} tokens",
-            component="cost_tracker",
-            metadata={
-                "query_id": query_id,
-                "model_name": model_name,
-                "total_cost": total_cost,
-                "total_tokens": total_tokens
-            },
-            query_id=query_id
-        )
-    
-    def track_performance(self, query_id: str, component: str, operation: str, 
-                         duration_ms: float, metadata: Dict[str, Any] = None):
-        """Track performance metrics."""
-        entry = PerformanceEntry(
-            timestamp=datetime.utcnow().isoformat(),
-            query_id=query_id,
-            component=component,
-            operation=operation,
-            duration_ms=duration_ms,
-            metadata=metadata or {}
-        )
-        
-        self.performance_entries.append(entry)
-        
-        self.log_debug(
-            f"Performance: {operation} took {duration_ms:.2f}ms",
-            component=component,
-            metadata={
-                "query_id": query_id,
-                "operation": operation,
-                "duration_ms": duration_ms,
-                **metadata
-            },
-            query_id=query_id
-        )
-    
-    def get_cost_summary(self) -> Dict[str, Any]:
-        """Get cost summary."""
-        if not self.cost_entries:
-            return {"total_cost": 0.0, "total_queries": 0, "average_cost_per_query": 0.0}
-        
-        total_queries = len(self.cost_entries)
-        average_cost = self.total_cost / total_queries if total_queries > 0 else 0.0
-        
-        # Cost by model
-        model_costs = {}
-        for entry in self.cost_entries:
-            model = entry.model_name
-            if model not in model_costs:
-                model_costs[model] = {"total_cost": 0.0, "queries": 0}
-            model_costs[model]["total_cost"] += entry.total_cost
-            model_costs[model]["queries"] += 1
-        
-        return {
-            "total_cost": self.total_cost,
-            "total_queries": total_queries,
-            "average_cost_per_query": average_cost,
-            "model_breakdown": model_costs
-        }
-    
-    def get_performance_summary(self) -> Dict[str, Any]:
-        """Get performance summary."""
-        if not self.performance_entries:
-            return {"total_operations": 0, "average_duration_ms": 0.0}
-        
-        total_operations = len(self.performance_entries)
-        average_duration = sum(entry.duration_ms for entry in self.performance_entries) / total_operations
-        
-        # Performance by component
-        component_performance = {}
-        for entry in self.performance_entries:
-            component = entry.component
-            if component not in component_performance:
-                component_performance[component] = {"total_duration": 0.0, "operations": 0}
-            component_performance[component]["total_duration"] += entry.duration_ms
-            component_performance[component]["operations"] += 1
-        
-        # Calculate averages
-        for component in component_performance:
-            perf = component_performance[component]
-            perf["average_duration"] = perf["total_duration"] / perf["operations"]
-        
-        return {
-            "total_operations": total_operations,
-            "average_duration_ms": average_duration,
-            "component_breakdown": component_performance
-        }
-    
-    def export_logs(self, output_file: str = None) -> str:
-        """Export logs to JSON file."""
-        output_file = output_file or f"logs_export_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
-        
-        export_data = {
-            "export_timestamp": datetime.utcnow().isoformat(),
-            "cost_summary": self.get_cost_summary(),
-            "performance_summary": self.get_performance_summary(),
-            "cost_entries": [asdict(entry) for entry in self.cost_entries],
-            "performance_entries": [asdict(entry) for entry in self.performance_entries]
-        }
-        
-        with open(output_file, 'w', encoding='utf-8') as f:
-            json.dump(export_data, f, indent=2, ensure_ascii=False)
-        
-        self.log_info(f"Logs exported to {output_file}")
-        return output_file
-    
-    def clear_logs(self):
-        """Clear all logs."""
-        self.cost_entries.clear()
-        self.performance_entries.clear()
-        self.total_cost = 0.0
-        self.log_info("All logs cleared")
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.cursor()
+            
+            # Basic stats
+            cursor.execute("""
+                SELECT 
+                    COUNT(*) as total_queries,
+                    SUM(CASE WHEN success = 1 THEN 1 ELSE 0 END) as successful_queries,
+                    AVG(response_time) as avg_response_time,
+                    AVG(num_sources_retrieved) as avg_sources,
+                    AVG(max_similarity_score) as avg_max_similarity,
+                    AVG(avg_similarity_score) as avg_avg_similarity
+                FROM query_metrics 
+                WHERE timestamp >= ?
+            """, (since_time.isoformat(),))
+            
+            stats = cursor.fetchone()
+            
+            # Response time distribution
+            cursor.execute("""
+                SELECT 
+                    COUNT(*) as count,
+                    CASE 
+                        WHEN response_time < 1 THEN '< 1s'
+                        WHEN response_time < 5 THEN '1-5s'
+                        WHEN response_time < 10 THEN '5-10s'
+                        ELSE '> 10s'
+                    END as time_range
+                FROM query_metrics 
+                WHERE timestamp >= ?
+                GROUP BY time_range
+            """, (since_time.isoformat(),))
+            
+            response_time_dist = dict(cursor.fetchall())
+            
+            return {
+                'period_hours': hours,
+                'total_queries': stats[0] or 0,
+                'successful_queries': stats[1] or 0,
+                'failed_queries': (stats[0] or 0) - (stats[1] or 0),
+                'success_rate': (stats[1] or 0) / (stats[0] or 1),
+                'avg_response_time': stats[2] or 0,
+                'avg_sources_retrieved': stats[3] or 0,
+                'avg_max_similarity': stats[4] or 0,
+                'avg_avg_similarity': stats[5] or 0,
+                'response_time_distribution': response_time_dist
+            }
 
-class PromptCache:
-    """Prompt caching system."""
+class PerformanceMonitor:
+    """Monitors system performance."""
     
-    def __init__(self, max_size: int = None):
-        self.max_size = max_size or Config.PROMPT_CACHE_SIZE
-        self.cache = {}
-        self.access_times = {}
-        self.hit_count = 0
-        self.miss_count = 0
+    def __init__(self):
+        """Initialize performance monitor."""
+        self.start_times = {}
     
-    def _generate_key(self, prompt: str, **kwargs) -> str:
-        """Generate cache key for prompt."""
-        # Create a hash of the prompt and parameters
-        key_data = {"prompt": prompt, **kwargs}
-        key_string = json.dumps(key_data, sort_keys=True)
-        return hashlib.md5(key_string.encode()).hexdigest()
-    
-    def get(self, prompt: str, **kwargs) -> Optional[Any]:
-        """Get cached response."""
-        key = self._generate_key(prompt, **kwargs)
+    @contextmanager
+    def time_operation(self, operation_name: str, metrics_collector: Optional[MetricsCollector] = None):
+        """Context manager for timing operations."""
+        start_time = time.time()
+        success = True
+        error = None
         
-        if key in self.cache:
-            self.access_times[key] = time.time()
-            self.hit_count += 1
-            return self.cache[key]
-        
-        self.miss_count += 1
-        return None
+        try:
+            yield
+        except Exception as e:
+            success = False
+            error = str(e)
+            raise
+        finally:
+            duration = time.time() - start_time
+            if metrics_collector:
+                metrics_collector.record_performance_log(
+                    operation_name, duration, success, {'error': error} if error else None
+                )
     
-    def set(self, prompt: str, response: Any, **kwargs):
-        """Cache response."""
-        key = self._generate_key(prompt, **kwargs)
-        
-        # Remove oldest entry if cache is full
-        if len(self.cache) >= self.max_size:
-            oldest_key = min(self.access_times.keys(), key=lambda k: self.access_times[k])
-            del self.cache[oldest_key]
-            del self.access_times[oldest_key]
-        
-        self.cache[key] = response
-        self.access_times[key] = time.time()
+    def start_timer(self, operation_name: str):
+        """Start timing an operation."""
+        self.start_times[operation_name] = time.time()
     
-    def clear(self):
-        """Clear cache."""
-        self.cache.clear()
-        self.access_times.clear()
-        self.hit_count = 0
-        self.miss_count = 0
+    def end_timer(self, operation_name: str) -> float:
+        """End timing an operation and return duration."""
+        if operation_name not in self.start_times:
+            return 0.0
+        
+        duration = time.time() - self.start_times[operation_name]
+        del self.start_times[operation_name]
+        return duration
+
+class TokenCounter:
+    """Counts tokens in text (approximate)."""
     
-    def get_stats(self) -> Dict[str, Any]:
-        """Get cache statistics."""
-        total_requests = self.hit_count + self.miss_count
-        hit_rate = self.hit_count / total_requests if total_requests > 0 else 0.0
+    def __init__(self):
+        """Initialize token counter."""
+        # Simple token counting - can be enhanced with tiktoken
+        pass
+    
+    def count_tokens(self, text: str) -> int:
+        """Count tokens in text."""
+        # Simple approximation: ~4 characters per token
+        return len(text) // 4
+    
+    def estimate_cost(self, tokens: int, model: str = "gpt-3.5-turbo") -> float:
+        """Estimate cost based on token count."""
+        # Approximate costs (as of 2024)
+        costs_per_1k_tokens = {
+            "gpt-3.5-turbo": 0.002,
+            "gpt-4": 0.03,
+            "claude-3": 0.015
+        }
+        
+        cost_per_1k = costs_per_1k_tokens.get(model, 0.002)
+        return (tokens / 1000) * cost_per_1k
+
+class RAGMonitor:
+    """Main monitoring class for RAG system."""
+    
+    def __init__(self, rag_system, metrics_collector: Optional[MetricsCollector] = None):
+        """Initialize RAG monitor."""
+        self.rag_system = rag_system
+        self.metrics_collector = metrics_collector or MetricsCollector()
+        self.performance_monitor = PerformanceMonitor()
+        self.token_counter = TokenCounter()
+        
+        # Cache for system stats
+        self._last_system_stats = None
+        self._last_system_stats_time = None
+    
+    def monitor_query(self, query: str, result: Dict[str, Any], 
+                     query_id: Optional[str] = None) -> QueryMetrics:
+        """Monitor a query and record metrics."""
+        if query_id is None:
+            query_id = f"query_{int(time.time() * 1000)}"
+        
+        # Extract metrics from result
+        response_time = result.get('query_time', 0.0)
+        sources = result.get('sources', [])
+        answer = result.get('answer', '')
+        
+        # Calculate similarity scores
+        similarities = result.get('similarity_scores', [])
+        max_similarity = max(similarities) if similarities else 0.0
+        avg_similarity = sum(similarities) / len(similarities) if similarities else 0.0
+        
+        # Estimate retrieval and generation times (approximate)
+        retrieval_time = response_time * 0.3  # Assume 30% for retrieval
+        generation_time = response_time * 0.7  # Assume 70% for generation
+        
+        # Count tokens
+        token_count = self.token_counter.count_tokens(query + answer)
+        
+        # Create metrics
+        metrics = QueryMetrics(
+            query_id=query_id,
+            timestamp=datetime.now(),
+            query_text=query[:500],  # Truncate for storage
+            response_time=response_time,
+            retrieval_time=retrieval_time,
+            generation_time=generation_time,
+            num_sources_retrieved=len(sources),
+            max_similarity_score=max_similarity,
+            avg_similarity_score=avg_similarity,
+            answer_length=len(answer),
+            token_count=token_count,
+            success=result.get('retrieval_success', False),
+            error_message=result.get('error')
+        )
+        
+        # Record metrics
+        if self.metrics_collector:
+            self.metrics_collector.record_query(metrics)
+        
+        return metrics
+    
+    def get_system_metrics(self, force_refresh: bool = False) -> SystemMetrics:
+        """Get current system metrics."""
+        now = datetime.now()
+        
+        # Use cache if available and not expired
+        if (not force_refresh and self._last_system_stats and 
+            self._last_system_stats_time and 
+            (now - self._last_system_stats_time).seconds < 60):
+            return self._last_system_stats
+        
+        # Get stats from RAG system
+        rag_stats = self.rag_system.get_document_stats()
+        
+        # Get query stats from last hour
+        query_stats = self.metrics_collector.get_query_stats(hours=1)
+        
+        # Get system resource usage (simplified)
+        try:
+            import psutil
+            memory_usage = psutil.virtual_memory().used / (1024 * 1024)  # MB
+            cpu_usage = psutil.cpu_percent()
+        except ImportError:
+            memory_usage = 0.0
+            cpu_usage = 0.0
+        
+        metrics = SystemMetrics(
+            timestamp=now,
+            total_queries=query_stats['total_queries'],
+            successful_queries=query_stats['successful_queries'],
+            failed_queries=query_stats['failed_queries'],
+            avg_response_time=query_stats['avg_response_time'],
+            total_documents=rag_stats['total_documents'],
+            total_chunks=rag_stats['total_chunks'],
+            total_embeddings=rag_stats['total_embeddings'],
+            memory_usage_mb=memory_usage,
+            cpu_usage_percent=cpu_usage
+        )
+        
+        # Cache the result
+        self._last_system_stats = metrics
+        self._last_system_stats_time = now
+        
+        # Record system metrics
+        self.metrics_collector.record_system_metrics(metrics)
+        
+        return metrics
+    
+    def generate_report(self, hours: int = 24) -> Dict[str, Any]:
+        """Generate a comprehensive monitoring report."""
+        query_stats = self.metrics_collector.get_query_stats(hours)
+        system_metrics = self.get_system_metrics()
         
         return {
-            "cache_size": len(self.cache),
-            "max_size": self.max_size,
-            "hit_count": self.hit_count,
-            "miss_count": self.miss_count,
-            "hit_rate": hit_rate,
-            "total_requests": total_requests
+            'report_timestamp': datetime.now().isoformat(),
+            'period_hours': hours,
+            'query_metrics': query_stats,
+            'system_metrics': asdict(system_metrics),
+            'recommendations': self._generate_recommendations(query_stats, system_metrics)
         }
+    
+    def _generate_recommendations(self, query_stats: Dict[str, Any], 
+                                system_metrics: SystemMetrics) -> List[str]:
+        """Generate recommendations based on metrics."""
+        recommendations = []
+        
+        # Response time recommendations
+        if query_stats['avg_response_time'] > 10:
+            recommendations.append("Consider optimizing retrieval or generation for faster response times")
+        
+        # Success rate recommendations
+        if query_stats['success_rate'] < 0.8:
+            recommendations.append("Investigate failed queries to improve success rate")
+        
+        # Similarity score recommendations
+        if query_stats['avg_max_similarity'] < 0.5:
+            recommendations.append("Consider improving embedding quality or retrieval parameters")
+        
+        # Resource usage recommendations
+        if system_metrics.memory_usage_mb > 1000:
+            recommendations.append("Monitor memory usage - consider optimizing vector storage")
+        
+        if system_metrics.cpu_usage_percent > 80:
+            recommendations.append("High CPU usage detected - consider load balancing")
+        
+        return recommendations
