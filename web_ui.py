@@ -84,6 +84,23 @@ def initialize_system():
         attribution_analyzer = AttributionAnalyzer()
         metrics_collector = MetricsCollector()
         monitor = RAGMonitor(rag_system, metrics_collector)
+
+        # --- Auto-ingest sample corpus on first launch ---
+        try:
+            sample_dir = config.get_sample_corpus_dir()
+            if sample_dir.exists():
+                corpus_files = list(sample_dir.glob("*"))
+                if corpus_files:
+                    logger.info("Clearing old data before ingestion to avoid duplicates")
+                    rag_system.clear_all_data()
+                    logger.info(f"Auto-ingesting sample corpus from: {sample_dir}")
+                    rag_system.ingest_directory(str(sample_dir))
+                else:
+                    logger.warning(f"Sample corpus directory is empty: {sample_dir}")
+            else:
+                logger.warning(f"Sample corpus directory not found: {sample_dir}")
+        except Exception as e:
+            logger.error(f"Error auto-ingesting sample corpus: {e}")
         
         return rag_system, guardrails, attribution_analyzer, monitor, config
     except Exception as e:

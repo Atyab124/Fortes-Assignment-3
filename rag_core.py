@@ -196,6 +196,15 @@ class RAGSystem:
                 query_embedding, top_k, similarity_threshold
             )
             
+            # --- Debug: Log retrieved chunks for attribution analysis ---
+            if similar_chunks:
+                logger.info(f"Retrieved {len(similar_chunks)} chunks for query: {question}")
+                for i, c in enumerate(similar_chunks[:3]):  # show up to 3 chunks
+                    content_preview = c['content'][:150].replace("\n", " ")
+                    logger.info(f"[Chunk {i+1}] sim={c.get('similarity', 0):.3f} | preview: {content_preview}...")
+            else:
+                logger.warning(f"No similar chunks retrieved for query: {question}")
+
             if not similar_chunks:
                 return {
                     'answer': "I couldn't find relevant information to answer your question.",
@@ -299,9 +308,10 @@ Context:
         return {
             'database': db_stats,
             'vector_store': vector_stats,
-            'total_documents': db_stats['documents'],
-            'total_chunks': db_stats['chunks'],
-            'total_embeddings': db_stats['embeddings']
+            'total_documents': db_stats.get('documents', 0),
+            'total_chunks': db_stats.get('chunks', 0),
+            'total_embeddings': db_stats.get('embeddings', 0),
+            'file_types': db_stats.get('file_types', {})
         }
     
     def clear_all_data(self):

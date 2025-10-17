@@ -198,6 +198,22 @@ def main():
     try:
         # Set up RAG system
         rag_system, guardrails, attribution_analyzer, monitor = setup_rag_system(config)
+
+        # --- Auto-ingest sample corpus if no --ingest argument ---
+        if not args.ingest:
+            sample_corpus_dir = config.get_sample_corpus_dir()
+            if sample_corpus_dir.exists():
+                try:
+                    corpus_files = list(sample_corpus_dir.glob("*"))
+                    if corpus_files:
+                        logger.info(f"Auto-ingesting sample corpus from: {sample_corpus_dir}")
+                        ingest_documents(rag_system, str(sample_corpus_dir))
+                    else:
+                        logger.warning(f"Sample corpus directory is empty: {sample_corpus_dir}")
+                except Exception as e:
+                    logger.error(f"Failed to ingest sample corpus automatically: {e}")
+            else:
+                logger.warning(f"Sample corpus directory not found: {sample_corpus_dir}")
         
         # Handle different modes
         if args.clear:

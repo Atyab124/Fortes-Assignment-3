@@ -52,9 +52,17 @@ class Config:
         data_dir.mkdir(exist_ok=True)
         return data_dir
     
+    # @classmethod
+    # def get_sample_corpus_dir(cls) -> Path:
+    #     """Get the sample corpus directory path."""
+    #     corpus_dir = Path("sample_corpus")
+    #     corpus_dir.mkdir(exist_ok=True)
+    #     return corpus_dir
+
     @classmethod
     def get_sample_corpus_dir(cls) -> Path:
-        """Get the sample corpus directory path."""
-        corpus_dir = Path("sample_corpus")
+        """Get absolute path to sample corpus directory."""
+        base_dir = Path(__file__).resolve().parent
+        corpus_dir = base_dir / "sample_corpus"
         corpus_dir.mkdir(exist_ok=True)
         return corpus_dir

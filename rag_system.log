@@ -1,0 +1,54 @@
+2025-10-17 13:22:32,168 - __main__ - INFO - Initializing RAG system...
+2025-10-17 13:22:32,169 - database - INFO - Database initialized successfully
+2025-10-17 13:22:32,169 - vector_store - INFO - Created new FAISS index with dimension 768
+2025-10-17 13:22:35,198 - httpx - INFO - HTTP Request: GET http://localhost:11434/api/tags "HTTP/1.1 200 OK"
+2025-10-17 13:22:35,199 - rag_core - INFO - Ollama client initialized successfully
+2025-10-17 13:22:35,203 - __main__ - INFO - RAG system initialized successfully
+2025-10-17 13:22:35,203 - __main__ - INFO - Starting interactive query mode. Type 'quit' to exit.
+2025-10-17 13:23:01,617 - rag_core - INFO - Processing query: what kind of documents do you have in your corpus
+2025-10-17 13:23:03,215 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-17 13:23:03,215 - rag_core - INFO - Generated 1 embeddings
+2025-10-17 19:26:09,034 - __main__ - INFO - Initializing RAG system...
+2025-10-17 19:26:09,042 - database - INFO - Database initialized successfully
+2025-10-17 19:26:09,057 - vector_store - INFO - Loaded existing FAISS index with 38 vectors
+2025-10-17 19:26:12,324 - httpx - INFO - HTTP Request: GET http://localhost:11434/api/tags "HTTP/1.1 200 OK"
+2025-10-17 19:26:12,326 - rag_core - INFO - Ollama client initialized successfully
+2025-10-17 19:26:12,331 - __main__ - INFO - RAG system initialized successfully
+2025-10-17 19:26:12,332 - __main__ - INFO - Auto-ingesting sample corpus from: D:\Experimental\Fortes\Assignment 3\sample_corpus
+2025-10-17 19:26:12,332 - __main__ - INFO - Ingesting directory: D:\Experimental\Fortes\Assignment 3\sample_corpus
+2025-10-17 19:26:12,333 - rag_core - INFO - Processing document: D:\Experimental\Fortes\Assignment 3\sample_corpus\ai_ethics.md
+2025-10-17 19:26:12,349 - document_processor - INFO - Created 10 chunks from text of length 7192
+2025-10-17 19:26:12,355 - database - INFO - Added document: ai_ethics.md (ID: 4)
+2025-10-17 19:26:15,269 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-17 19:26:15,272 - rag_core - INFO - Generated 10 embeddings
+2025-10-17 19:26:15,560 - database - INFO - Added 10 chunks for document 4
+2025-10-17 19:26:15,562 - vector_store - INFO - Added 10 vectors to index
+2025-10-17 19:26:15,571 - database - INFO - Added 10 embeddings
+2025-10-17 19:26:15,572 - vector_store - INFO - Added 10 chunks and embeddings for document 4
+2025-10-17 19:26:15,575 - vector_store - INFO - Saved FAISS index with 48 vectors
+2025-10-17 19:26:15,575 - rag_core - INFO - Successfully ingested ai_ethics.md in 3.24s
+2025-10-17 19:26:15,576 - rag_core - INFO - Processing document: D:\Experimental\Fortes\Assignment 3\sample_corpus\machine_learning_basics.md
+2025-10-17 19:26:15,590 - document_processor - INFO - Created 17 chunks from text of length 10461
+2025-10-17 19:26:15,597 - database - INFO - Added document: machine_learning_basics.md (ID: 5)
+2025-10-17 19:26:16,656 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-17 19:26:17,364 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-17 19:26:17,366 - rag_core - INFO - Generated 17 embeddings
+2025-10-17 19:26:17,373 - database - INFO - Added 17 chunks for document 5
+2025-10-17 19:26:17,374 - vector_store - INFO - Added 17 vectors to index
+2025-10-17 19:26:17,382 - database - INFO - Added 17 embeddings
+2025-10-17 19:26:17,383 - vector_store - INFO - Added 17 chunks and embeddings for document 5
+2025-10-17 19:26:17,384 - vector_store - INFO - Saved FAISS index with 65 vectors
+2025-10-17 19:26:17,385 - rag_core - INFO - Successfully ingested machine_learning_basics.md in 1.81s
+2025-10-17 19:26:17,385 - rag_core - INFO - Processing document: D:\Experimental\Fortes\Assignment 3\sample_corpus\neural_networks.txt
+2025-10-17 19:26:17,387 - document_processor - INFO - Created 11 chunks from text of length 9104
+2025-10-17 19:26:17,393 - database - INFO - Added document: neural_networks.txt (ID: 6)
+2025-10-17 19:26:18,768 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-17 19:26:18,909 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-17 19:26:18,909 - rag_core - INFO - Generated 11 embeddings
+2025-10-17 19:26:18,916 - database - INFO - Added 11 chunks for document 6
+2025-10-17 19:26:18,917 - vector_store - INFO - Added 11 vectors to index
+2025-10-17 19:26:18,925 - database - INFO - Added 11 embeddings
+2025-10-17 19:26:18,925 - vector_store - INFO - Added 11 chunks and embeddings for document 6
+2025-10-17 19:26:18,927 - vector_store - INFO - Saved FAISS index with 76 vectors
+2025-10-17 19:26:18,928 - rag_core - INFO - Successfully ingested neural_networks.txt in 1.54s
+2025-10-17 19:26:18,928 - __main__ - INFO - Ingestion complete: 3/3 files processed

@@ -272,7 +272,7 @@ class VectorDatabase:
                 'documents': doc_count,
                 'chunks': chunk_count,
                 'embeddings': embedding_count,
-                'file_types': file_types
+                'file_types': file_types or {}
             }
     
     def clear_database(self):
