@@ -19,8 +19,8 @@ class Config:
     
     # Document processing
     SUPPORTED_EXTENSIONS = {'.md', '.txt', '.pdf', '.docx'}
-    CHUNK_SIZE = 1000
-    CHUNK_OVERLAP = 200
+    CHUNK_SIZE = 300
+    CHUNK_OVERLAP = 60
     
     # Retrieval settings
     TOP_K = 5

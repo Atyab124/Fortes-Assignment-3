@@ -237,6 +237,15 @@ def handle_file_upload(rag_system: RAGSystem):
             successful = sum(1 for r in results if r.get('success', False))
             st.success(f"Successfully processed {successful}/{len(results)} files")
             
+            # Force FAISS reload so queries see new uploads
+            try:
+                rag_system.vector_manager.vector_store.save_index()
+                rag_system.vector_manager.vector_store._load_or_create_index()
+                logger.info("Reloaded FAISS index after file upload.")
+            except Exception as e:
+                st.error(f"Error reloading index: {e}")
+                logger.error(f"Index reload failed: {e}")
+
             # Show detailed results
             with st.expander("Detailed Results"):
                 for result in results:

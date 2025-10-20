@@ -5,10 +5,13 @@ import re
 from pathlib import Path
 from typing import List, Dict, Any, Optional
 import logging
-import PyPDF2
 import docx
 import markdown
 from bs4 import BeautifulSoup
+import pytesseract
+from pdf2image import convert_from_path
+import logging
+import ollama
 
 logger = logging.getLogger(__name__)
 
@@ -56,14 +59,69 @@ class DocumentProcessor:
         return soup.get_text()
     
     def _extract_pdf(self, file_path: Path) -> str:
-        """Extract text from .pdf files."""
-        text = ""
-        with open(file_path, 'rb') as f:
-            pdf_reader = PyPDF2.PdfReader(f)
-            for page in pdf_reader.pages:
-                text += page.extract_text() + "\n"
-        return text
-    
+        """Extract text from .pdf files using OCR only, then refine with Qwen2.5."""
+        import pytesseract
+        from pdf2image import convert_from_path
+        import logging
+        import ollama  # Qwen2.5 through local Ollama server
+
+        logger = logging.getLogger(__name__)
+        text_parts = []
+
+        try:
+            logger.info(f"OCR extraction started for {file_path.name}")
+            images = convert_from_path(file_path, dpi=200)
+            logger.info(f"Converted {len(images)} pages to images for OCR: {file_path.name}")
+
+            for i, image in enumerate(images):
+                page_text = pytesseract.image_to_string(image)
+                text_parts.append(page_text)
+                logger.debug(f"OCR processed page {i + 1}/{len(images)} of {file_path.name}")
+                try:
+                    image.close()
+                except Exception:
+                    pass
+
+            raw_text = "\n".join(text_parts).strip()
+            logger.info(f"OCR complete for {file_path.name}, length={len(raw_text)} chars")
+
+            # --- Qwen2.5 Refinement Step ---
+            if len(raw_text) > 50:
+                logger.info(f"Refining OCR output for {file_path.name} using Qwen2.5...")
+                try:
+                    response = ollama.chat(
+                        model="qwen2.5:latest",
+                        messages=[
+                            {
+                                "role": "system",
+                                "content": (
+                                    "You are a text cleanup assistant. "
+                                    "Your job is to refine OCR text by fixing spelling errors, "
+                                    "restoring punctuation, joining broken lines, and keeping the original meaning."
+                                ),
+                            },
+                            {"role": "user", "content": raw_text[:12000]},  # safety cutoff
+                        ],
+                    )
+                    refined_text = response["message"]["content"].strip()
+                    if len(refined_text) > 0:
+                        logger.info(f"Refinement successful for {file_path.name}")
+                        return refined_text
+                    else:
+                        logger.warning(f"Refinement produced empty result, using raw OCR text.")
+                        return raw_text
+                except Exception as e:
+                    logger.error(f"Refinement via Qwen2.5 failed: {e}")
+                    return raw_text
+            else:
+                logger.warning(f"OCR output too short to refine for {file_path.name}")
+                return raw_text
+
+        except Exception as e:
+            logger.exception(f"OCR extraction failed for {file_path}: {e}")
+            raise
+
+
     def _extract_docx(self, file_path: Path) -> str:
         """Extract text from .docx files."""
         doc = docx.Document(file_path)

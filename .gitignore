@@ -1,1 +1,8 @@
 /env
+temp.ipynb
+__pycache__/
+faiss_index_metadata.pkl
+faiss_index.bin
+metrics.db
+rag_system.log
+vector_store.db

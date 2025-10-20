@@ -5,7 +5,8 @@ import logging
 from typing import List, Dict, Any, Optional, Tuple
 from dataclasses import dataclass
 from enum import Enum
-import difflib
+import numpy as np
+import ollama
 
 logger = logging.getLogger(__name__)
 
@@ -71,12 +72,24 @@ class SemanticMatcher:
     def __init__(self):
         """Initialize semantic matcher."""
         self.similarity_threshold = 0.3
+        self.embed_model = "nomic-embed-text"   # your Ollama embedder name
+    
+    def _embed(self, text: str):
+        """Generate embedding via Ollama."""
+        try:
+            response = ollama.embeddings(model=self.embed_model, prompt=text)
+            return np.array(response["embedding"], dtype=np.float32)
+        except Exception as e:
+            logger.error(f"Embedding error: {e}")
+            return np.zeros(768, dtype=np.float32)
     
     def calculate_similarity(self, text1: str, text2: str) -> float:
         """Calculate semantic similarity between two texts."""
-        # Use difflib for basic similarity
-        similarity = difflib.SequenceMatcher(None, text1.lower(), text2.lower()).ratio()
-        return similarity
+        vec1 = self._embed(text1)
+        vec2 = self._embed(text2)
+        if np.linalg.norm(vec1) == 0 or np.linalg.norm(vec2) == 0:
+            return 0.0
+        return float(np.dot(vec1, vec2) / (np.linalg.norm(vec1) * np.linalg.norm(vec2)))
     
     def find_best_matches(self, sentence: str, source_chunks: List[Dict[str, Any]], 
                          top_k: int = 3) -> List[Tuple[Dict[str, Any], float]]:
