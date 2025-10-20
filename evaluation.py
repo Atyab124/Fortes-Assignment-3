@@ -10,6 +10,8 @@ from dataclasses import dataclass
 import re
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
+from dataclasses import asdict
+
 
 logger = logging.getLogger(__name__)
 
@@ -297,8 +299,21 @@ class EvaluationLoader:
     @staticmethod
     def save_eval_report(report: Dict[str, Any], output_path: str):
         """Save evaluation report to JSON file."""
+        def serialize(obj):
+            # Recursively convert dataclasses to dicts
+            if isinstance(obj, list):
+                return [serialize(i) for i in obj]
+            elif hasattr(obj, "__dataclass_fields__"):
+                return asdict(obj)
+            elif isinstance(obj, dict):
+                return {k: serialize(v) for k, v in obj.items()}
+            else:
+                return obj
+
+        serializable_report = serialize(report)
+        
         with open(output_path, 'w', encoding='utf-8') as f:
-            json.dump(report, f, indent=2, ensure_ascii=False)
+            json.dump(serializable_report, f, indent=2, ensure_ascii=False)
         
         logger.info(f"Evaluation report saved to {output_path}")
 
