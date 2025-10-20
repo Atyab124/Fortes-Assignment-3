@@ -295,5 +295,3 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - [ ] Advanced visualization for document relationships
 
 ---
-
-**Built with ❤️ for the AI community**
