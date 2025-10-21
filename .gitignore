@@ -1,4 +1,5 @@
 /env
+/test_corpus
 temp.ipynb
 __pycache__/
 faiss_index_metadata.pkl
