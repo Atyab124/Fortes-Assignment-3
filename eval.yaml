@@ -66,5 +66,5 @@ questions:
 settings:
   similarity_threshold: 0.7
   top_k: 5
-  max_response_time: 30.0
+  max_response_time: 60.0
   require_sources: true

@@ -19,11 +19,11 @@ class Config:
     
     # Document processing
     SUPPORTED_EXTENSIONS = {'.md', '.txt', '.pdf', '.docx'}
-    CHUNK_SIZE = 300
-    CHUNK_OVERLAP = 60
+    CHUNK_SIZE = 250
+    CHUNK_OVERLAP = 50
     
     # Retrieval settings
-    TOP_K = 5
+    TOP_K = 3
     SIMILARITY_THRESHOLD = 0.7
     
     # Guardrails
