@@ -1,0 +1,1710 @@
+{
+  "individual_results": [
+    {
+      "question": "What is machine learning?",
+      "expected_answer": "Machine learning is a subset of artificial intelligence that enables computers to learn and improve from experience without being explicitly programmed.",
+      "predicted_answer": "Machine learning is a subset of artificial intelligence (AI) that enables computers to learn and improve from experience without being explicitly programmed. It focuses on developing algorithms that can access data and use it to learn patterns and make predictions or decisions.",
+      "expected_sources": [
+        "machine_learning_basics.md"
+      ],
+      "predicted_sources": [
+        {
+          "document_id": 62,
+          "chunk_id": 914,
+          "content": "Machine Learning Fundamentals Introduction Machine learning is a subset of artificial intelligence (AI) that enables computers to learn and improve from experience without being explicitly programmed.",
+          "filename": "machine_learning_basics.md",
+          "similarity": 0.8450713157653809
+        },
+        {
+          "document_id": 58,
+          "chunk_id": 812,
+          "content": "Machine Learning Fundamentals Introduction Machine learning is a subset of artificial intelligence (AI) that enables computers to learn and improve from experience without being explicitly programmed.",
+          "filename": "Unknown",
+          "similarity": 0.8450713157653809
+        },
+        {
+          "document_id": 54,
+          "chunk_id": 710,
+          "content": "Machine Learning Fundamentals Introduction Machine learning is a subset of artificial intelligence (AI) that enables computers to learn and improve from experience without being explicitly programmed.",
+          "filename": "Unknown",
+          "similarity": 0.8450713157653809
+        },
+        {
+          "document_id": 58,
+          "chunk_id": 813,
+          "content": "improve from experience without being explicitly programmed. It focuses on developing algorithms that can access data and use it to learn patterns and make predictions or decisions.Types of Machine Le...",
+          "filename": "Unknown",
+          "similarity": 0.7825628519058228
+        },
+        {
+          "document_id": 54,
+          "chunk_id": 711,
+          "content": "improve from experience without being explicitly programmed. It focuses on developing algorithms that can access data and use it to learn patterns and make predictions or decisions.Types of Machine Le...",
+          "filename": "Unknown",
+          "similarity": 0.7825628519058228
+        }
+      ],
+      "exact_match": false,
+      "f1_score": 0.6829268292682926,
+      "similarity_score": 0.5185185185185185,
+      "retrieval_success": true,
+      "grounding_score": 0.8200679302215577,
+      "attribution_score": 0.892893190185229,
+      "response_time": 25.31570816040039,
+      "metadata": {
+        "rag_result": {
+          "answer": "Machine learning is a subset of artificial intelligence (AI) that enables computers to learn and improve from experience without being explicitly programmed. It focuses on developing algorithms that can access data and use it to learn patterns and make predictions or decisions.",
+          "sources": [
+            {
+              "document_id": 62,
+              "chunk_id": 914,
+              "content": "Machine Learning Fundamentals Introduction Machine learning is a subset of artificial intelligence (AI) that enables computers to learn and improve from experience without being explicitly programmed.",
+              "filename": "machine_learning_basics.md",
+              "similarity": 0.8450713157653809
+            },
+            {
+              "document_id": 58,
+              "chunk_id": 812,
+              "content": "Machine Learning Fundamentals Introduction Machine learning is a subset of artificial intelligence (AI) that enables computers to learn and improve from experience without being explicitly programmed.",
+              "filename": "Unknown",
+              "similarity": 0.8450713157653809
+            },
+            {
+              "document_id": 54,
+              "chunk_id": 710,
+              "content": "Machine Learning Fundamentals Introduction Machine learning is a subset of artificial intelligence (AI) that enables computers to learn and improve from experience without being explicitly programmed.",
+              "filename": "Unknown",
+              "similarity": 0.8450713157653809
+            },
+            {
+              "document_id": 58,
+              "chunk_id": 813,
+              "content": "improve from experience without being explicitly programmed. It focuses on developing algorithms that can access data and use it to learn patterns and make predictions or decisions.Types of Machine Le...",
+              "filename": "Unknown",
+              "similarity": 0.7825628519058228
+            },
+            {
+              "document_id": 54,
+              "chunk_id": 711,
+              "content": "improve from experience without being explicitly programmed. It focuses on developing algorithms that can access data and use it to learn patterns and make predictions or decisions.Types of Machine Le...",
+              "filename": "Unknown",
+              "similarity": 0.7825628519058228
+            }
+          ],
+          "similarity_scores": [
+            0.8450713157653809,
+            0.8450713157653809,
+            0.8450713157653809,
+            0.7825628519058228,
+            0.7825628519058228
+          ],
+          "query_time": 25.310098886489868,
+          "retrieval_success": true,
+          "num_sources": 5
+        },
+        "attribution_metadata": {
+          "total_sentences": 2,
+          "hallucinated_sentences": 0,
+          "attribution_counts": {
+            "high": 2,
+            "medium": 0,
+            "low": 0,
+            "none": 0
+          },
+          "average_confidence": 0.892893190185229,
+          "quality_score": 0.892893190185229,
+          "problematic_sentences": [],
+          "attribution_summary": {
+            "high_confidence": 2,
+            "medium_confidence": 0,
+            "low_confidence": 0,
+            "no_attribution": 0
+          }
+        }
+      }
+    },
+    {
+      "question": "How do neural networks work?",
+      "expected_answer": "Neural networks are computing systems inspired by biological neural networks. They consist of interconnected nodes (neurons) that process information through weighted connections.",
+      "predicted_answer": "The provided context does not contain detailed information on how neural networks work. It only states that neural networks are computing systems inspired by biological neural networks in animal brains and that they learn from examples without being programmed with specific rules. For a more detailed explanation, additional sources would be needed.",
+      "expected_sources": [
+        "neural_networks.txt"
+      ],
+      "predicted_sources": [
+        {
+          "document_id": 63,
+          "chunk_id": 948,
+          "content": "Neural Networks: A Comprehensive Guide Introduction to Neural Networks Neural networks are computing systems inspired by biological neural networks found in animal brains.These systems learn to perfor...",
+          "filename": "neural_networks.txt",
+          "similarity": 0.7897447347640991
+        },
+        {
+          "document_id": 59,
+          "chunk_id": 846,
+          "content": "Neural Networks: A Comprehensive Guide Introduction to Neural Networks Neural networks are computing systems inspired by biological neural networks found in animal brains.These systems learn to perfor...",
+          "filename": "Unknown",
+          "similarity": 0.7897447347640991
+        },
+        {
+          "document_id": 55,
+          "chunk_id": 744,
+          "content": "Neural Networks: A Comprehensive Guide Introduction to Neural Networks Neural networks are computing systems inspired by biological neural networks found in animal brains.These systems learn to perfor...",
+          "filename": "Unknown",
+          "similarity": 0.7897447347640991
+        },
+        {
+          "document_id": 59,
+          "chunk_id": 877,
+          "content": "ations is essential for anyone working with neural networks. As the field continues to advance, new architectures, training methods, and applications will continue to emerge, making neural networks an...",
+          "filename": "Unknown",
+          "similarity": 0.7483027577400208
+        },
+        {
+          "document_id": 55,
+          "chunk_id": 775,
+          "content": "ations is essential for anyone working with neural networks. As the field continues to advance, new architectures, training methods, and applications will continue to emerge, making neural networks an...",
+          "filename": "Unknown",
+          "similarity": 0.7483027577400208
+        }
+      ],
+      "exact_match": false,
+      "f1_score": 0.326530612244898,
+      "similarity_score": 0.1951219512195122,
+      "retrieval_success": true,
+      "grounding_score": 0.7731679439544678,
+      "attribution_score": 0.7136108080546061,
+      "response_time": 26.674837589263916,
+      "metadata": {
+        "rag_result": {
+          "answer": "The provided context does not contain detailed information on how neural networks work. It only states that neural networks are computing systems inspired by biological neural networks in animal brains and that they learn from examples without being programmed with specific rules. For a more detailed explanation, additional sources would be needed.",
+          "sources": [
+            {
+              "document_id": 63,
+              "chunk_id": 948,
+              "content": "Neural Networks: A Comprehensive Guide Introduction to Neural Networks Neural networks are computing systems inspired by biological neural networks found in animal brains.These systems learn to perfor...",
+              "filename": "neural_networks.txt",
+              "similarity": 0.7897447347640991
+            },
+            {
+              "document_id": 59,
+              "chunk_id": 846,
+              "content": "Neural Networks: A Comprehensive Guide Introduction to Neural Networks Neural networks are computing systems inspired by biological neural networks found in animal brains.These systems learn to perfor...",
+              "filename": "Unknown",
+              "similarity": 0.7897447347640991
+            },
+            {
+              "document_id": 55,
+              "chunk_id": 744,
+              "content": "Neural Networks: A Comprehensive Guide Introduction to Neural Networks Neural networks are computing systems inspired by biological neural networks found in animal brains.These systems learn to perfor...",
+              "filename": "Unknown",
+              "similarity": 0.7897447347640991
+            },
+            {
+              "document_id": 59,
+              "chunk_id": 877,
+              "content": "ations is essential for anyone working with neural networks. As the field continues to advance, new architectures, training methods, and applications will continue to emerge, making neural networks an...",
+              "filename": "Unknown",
+              "similarity": 0.7483027577400208
+            },
+            {
+              "document_id": 55,
+              "chunk_id": 775,
+              "content": "ations is essential for anyone working with neural networks. As the field continues to advance, new architectures, training methods, and applications will continue to emerge, making neural networks an...",
+              "filename": "Unknown",
+              "similarity": 0.7483027577400208
+            }
+          ],
+          "similarity_scores": [
+            0.7897447347640991,
+            0.7897447347640991,
+            0.7897447347640991,
+            0.7483027577400208,
+            0.7483027577400208
+          ],
+          "query_time": 26.67450761795044,
+          "retrieval_success": true,
+          "num_sources": 5
+        },
+        "attribution_metadata": {
+          "total_sentences": 3,
+          "hallucinated_sentences": 0,
+          "attribution_counts": {
+            "high": 2,
+            "medium": 1,
+            "low": 0,
+            "none": 0
+          },
+          "average_confidence": 0.7136108080546061,
+          "quality_score": 0.7136108080546061,
+          "problematic_sentences": [],
+          "attribution_summary": {
+            "high_confidence": 2,
+            "medium_confidence": 1,
+            "low_confidence": 0,
+            "no_attribution": 0
+          }
+        }
+      }
+    },
+    {
+      "question": "What are the ethical concerns in AI?",
+      "expected_answer": "AI ethics concerns include bias and fairness, privacy and data protection, transparency and explainability, accountability and responsibility, and the impact on employment and society.",
+      "predicted_answer": "Based on the provided context, the ethical concerns in AI include:\n\n1. Bias detection and mitigation techniques\n2. Explainable AI and interpretability \n3. Privacy-preserving machine learning methods\n4. Leadership commitment to ethical AI development\n5. Foster a culture of responsibility within organizations\n6. Open discussion of ethical concerns\n7. Rewarding ethical behavior and decision-making\n8. Learning from mistakes and failures\n9. Emerging challenges as AI evolves, such as:\n   - Artificial General Intelligence (AGI) and questions about consciousness, rights, and control\n   - Quantum AI and its potential for exponentially more powerful systems\n   - Brain-computer interfaces blurring the line between human and artificial intelligence\n   - Synthetic media like deepfakes\n\nThe context does not provide specific details on what these concerns entail or how to address them, only that they are important ethical considerations in the development of AI.",
+      "expected_sources": [
+        "ai_ethics.md"
+      ],
+      "predicted_sources": [
+        {
+          "document_id": 60,
+          "chunk_id": 880,
+          "content": "y lives, from recommendation systems to autonomous vehicles. As AI systems become more sophisticated and widespread, it is crucial to address the ethical implications and ensure responsible developmen...",
+          "filename": "ai_ethics.md",
+          "similarity": 0.8584775924682617
+        },
+        {
+          "document_id": 56,
+          "chunk_id": 778,
+          "content": "y lives, from recommendation systems to autonomous vehicles. As AI systems become more sophisticated and widespread, it is crucial to address the ethical implications and ensure responsible developmen...",
+          "filename": "Unknown",
+          "similarity": 0.8584775924682617
+        },
+        {
+          "document_id": 52,
+          "chunk_id": 675,
+          "content": "y lives, from recommendation systems to autonomous vehicles. As AI systems become more sophisticated and widespread, it is crucial to address the ethical implications and ensure responsible developmen...",
+          "filename": "Unknown",
+          "similarity": 0.8584775924682617
+        },
+        {
+          "document_id": 56,
+          "chunk_id": 798,
+          "content": "nt of ethical thinking throughout the development process 4. Foster a Culture of Responsibility Creating an organizational culture that prioritizes ethics: Leadership commitment to ethical AI developm...",
+          "filename": "Unknown",
+          "similarity": 0.8482593894004822
+        },
+        {
+          "document_id": 52,
+          "chunk_id": 695,
+          "content": "nt of ethical thinking throughout the development process 4. Foster a Culture of Responsibility Creating an organizational culture that prioritizes ethics: Leadership commitment to ethical AI developm...",
+          "filename": "Unknown",
+          "similarity": 0.8482593894004822
+        }
+      ],
+      "exact_match": false,
+      "f1_score": 0.11428571428571428,
+      "similarity_score": 0.06060606060606061,
+      "retrieval_success": true,
+      "grounding_score": 0.85439031124115,
+      "attribution_score": 0.6364120786388715,
+      "response_time": 41.95085668563843,
+      "metadata": {
+        "rag_result": {
+          "answer": "Based on the provided context, the ethical concerns in AI include:\n\n1. Bias detection and mitigation techniques\n2. Explainable AI and interpretability \n3. Privacy-preserving machine learning methods\n4. Leadership commitment to ethical AI development\n5. Foster a culture of responsibility within organizations\n6. Open discussion of ethical concerns\n7. Rewarding ethical behavior and decision-making\n8. Learning from mistakes and failures\n9. Emerging challenges as AI evolves, such as:\n   - Artificial General Intelligence (AGI) and questions about consciousness, rights, and control\n   - Quantum AI and its potential for exponentially more powerful systems\n   - Brain-computer interfaces blurring the line between human and artificial intelligence\n   - Synthetic media like deepfakes\n\nThe context does not provide specific details on what these concerns entail or how to address them, only that they are important ethical considerations in the development of AI.",
+          "sources": [
+            {
+              "document_id": 60,
+              "chunk_id": 880,
+              "content": "y lives, from recommendation systems to autonomous vehicles. As AI systems become more sophisticated and widespread, it is crucial to address the ethical implications and ensure responsible developmen...",
+              "filename": "ai_ethics.md",
+              "similarity": 0.8584775924682617
+            },
+            {
+              "document_id": 56,
+              "chunk_id": 778,
+              "content": "y lives, from recommendation systems to autonomous vehicles. As AI systems become more sophisticated and widespread, it is crucial to address the ethical implications and ensure responsible developmen...",
+              "filename": "Unknown",
+              "similarity": 0.8584775924682617
+            },
+            {
+              "document_id": 52,
+              "chunk_id": 675,
+              "content": "y lives, from recommendation systems to autonomous vehicles. As AI systems become more sophisticated and widespread, it is crucial to address the ethical implications and ensure responsible developmen...",
+              "filename": "Unknown",
+              "similarity": 0.8584775924682617
+            },
+            {
+              "document_id": 56,
+              "chunk_id": 798,
+              "content": "nt of ethical thinking throughout the development process 4. Foster a Culture of Responsibility Creating an organizational culture that prioritizes ethics: Leadership commitment to ethical AI developm...",
+              "filename": "Unknown",
+              "similarity": 0.8482593894004822
+            },
+            {
+              "document_id": 52,
+              "chunk_id": 695,
+              "content": "nt of ethical thinking throughout the development process 4. Foster a Culture of Responsibility Creating an organizational culture that prioritizes ethics: Leadership commitment to ethical AI developm...",
+              "filename": "Unknown",
+              "similarity": 0.8482593894004822
+            }
+          ],
+          "similarity_scores": [
+            0.8584775924682617,
+            0.8584775924682617,
+            0.8584775924682617,
+            0.8482593894004822,
+            0.8482593894004822
+          ],
+          "query_time": 41.95053219795227,
+          "retrieval_success": true,
+          "num_sources": 5
+        },
+        "attribution_metadata": {
+          "total_sentences": 10,
+          "hallucinated_sentences": 0,
+          "attribution_counts": {
+            "high": 4,
+            "medium": 6,
+            "low": 0,
+            "none": 0
+          },
+          "average_confidence": 0.6364120786388715,
+          "quality_score": 0.6364120786388715,
+          "problematic_sentences": [],
+          "attribution_summary": {
+            "high_confidence": 4,
+            "medium_confidence": 6,
+            "low_confidence": 0,
+            "no_attribution": 0
+          }
+        }
+      }
+    },
+    {
+      "question": "Explain the concept of overfitting in machine learning.",
+      "expected_answer": "Overfitting occurs when a machine learning model learns the training data too well, including its noise and outliers, resulting in poor performance on new, unseen data.",
+      "predicted_answer": "Overfitting in machine learning occurs when a model is too complex and captures noise or outliers in the training data, leading to poor performance on new, unseen data. It is characterized by high accuracy on the training data but low accuracy on test data, as the model fails to generalize well. This happens when the model's complexity exceeds that of the underlying relationship in the data.",
+      "expected_sources": [
+        "machine_learning_basics.md"
+      ],
+      "predicted_sources": [
+        {
+          "document_id": 62,
+          "chunk_id": 922,
+          "content": "outliers, resulting in poor performance on new, unseen data. Signs of overfitting include: - High accuracy on training data but low accuracy on test data - Model complexity that exceeds the complexity...",
+          "filename": "machine_learning_basics.md",
+          "similarity": 0.7914993762969971
+        },
+        {
+          "document_id": 58,
+          "chunk_id": 820,
+          "content": "outliers, resulting in poor performance on new, unseen data. Signs of overfitting include: - High accuracy on training data but low accuracy on test data - Model complexity that exceeds the complexity...",
+          "filename": "Unknown",
+          "similarity": 0.7914993762969971
+        },
+        {
+          "document_id": 54,
+          "chunk_id": 718,
+          "content": "outliers, resulting in poor performance on new, unseen data. Signs of overfitting include: - High accuracy on training data but low accuracy on test data - Model complexity that exceeds the complexity...",
+          "filename": "Unknown",
+          "similarity": 0.7914993762969971
+        },
+        {
+          "document_id": 58,
+          "chunk_id": 821,
+          "content": "s too simple to capture the underlying patterns in the data. Signs of underfitting include: - Low accuracy on both training and test data - Model that is too simple for the problem complexity Solution...",
+          "filename": "Unknown",
+          "similarity": 0.7497104406356812
+        },
+        {
+          "document_id": 54,
+          "chunk_id": 719,
+          "content": "s too simple to capture the underlying patterns in the data. Signs of underfitting include: - Low accuracy on both training and test data - Model that is too simple for the problem complexity Solution...",
+          "filename": "Unknown",
+          "similarity": 0.7497104406356812
+        }
+      ],
+      "exact_match": false,
+      "f1_score": 0.5925925925925926,
+      "similarity_score": 0.42105263157894735,
+      "retrieval_success": true,
+      "grounding_score": 0.7747838020324707,
+      "attribution_score": 0.7714599172274271,
+      "response_time": 30.028435945510864,
+      "metadata": {
+        "rag_result": {
+          "answer": "Overfitting in machine learning occurs when a model is too complex and captures noise or outliers in the training data, leading to poor performance on new, unseen data. It is characterized by high accuracy on the training data but low accuracy on test data, as the model fails to generalize well. This happens when the model's complexity exceeds that of the underlying relationship in the data.",
+          "sources": [
+            {
+              "document_id": 62,
+              "chunk_id": 922,
+              "content": "outliers, resulting in poor performance on new, unseen data. Signs of overfitting include: - High accuracy on training data but low accuracy on test data - Model complexity that exceeds the complexity...",
+              "filename": "machine_learning_basics.md",
+              "similarity": 0.7914993762969971
+            },
+            {
+              "document_id": 58,
+              "chunk_id": 820,
+              "content": "outliers, resulting in poor performance on new, unseen data. Signs of overfitting include: - High accuracy on training data but low accuracy on test data - Model complexity that exceeds the complexity...",
+              "filename": "Unknown",
+              "similarity": 0.7914993762969971
+            },
+            {
+              "document_id": 54,
+              "chunk_id": 718,
+              "content": "outliers, resulting in poor performance on new, unseen data. Signs of overfitting include: - High accuracy on training data but low accuracy on test data - Model complexity that exceeds the complexity...",
+              "filename": "Unknown",
+              "similarity": 0.7914993762969971
+            },
+            {
+              "document_id": 58,
+              "chunk_id": 821,
+              "content": "s too simple to capture the underlying patterns in the data. Signs of underfitting include: - Low accuracy on both training and test data - Model that is too simple for the problem complexity Solution...",
+              "filename": "Unknown",
+              "similarity": 0.7497104406356812
+            },
+            {
+              "document_id": 54,
+              "chunk_id": 719,
+              "content": "s too simple to capture the underlying patterns in the data. Signs of underfitting include: - Low accuracy on both training and test data - Model that is too simple for the problem complexity Solution...",
+              "filename": "Unknown",
+              "similarity": 0.7497104406356812
+            }
+          ],
+          "similarity_scores": [
+            0.7914993762969971,
+            0.7914993762969971,
+            0.7914993762969971,
+            0.7497104406356812,
+            0.7497104406356812
+          ],
+          "query_time": 30.028048276901245,
+          "retrieval_success": true,
+          "num_sources": 5
+        },
+        "attribution_metadata": {
+          "total_sentences": 3,
+          "hallucinated_sentences": 0,
+          "attribution_counts": {
+            "high": 2,
+            "medium": 1,
+            "low": 0,
+            "none": 0
+          },
+          "average_confidence": 0.7714599172274271,
+          "quality_score": 0.7714599172274271,
+          "problematic_sentences": [],
+          "attribution_summary": {
+            "high_confidence": 2,
+            "medium_confidence": 1,
+            "low_confidence": 0,
+            "no_attribution": 0
+          }
+        }
+      }
+    },
+    {
+      "question": "What is the difference between supervised and unsupervised learning?",
+      "expected_answer": "Supervised learning uses labeled training data to learn a mapping from inputs to outputs, while unsupervised learning finds patterns in data without labeled examples.",
+      "predicted_answer": "Based on the provided context, supervised learning uses labeled training data to learn a mapping from inputs to outputs. However, the given context does not provide information about unsupervised learning or its differences from supervised learning. Therefore, I cannot answer what the difference between supervised and unsupervised learning is based solely on this context.",
+      "expected_sources": [
+        "machine_learning_basics.md"
+      ],
+      "predicted_sources": [
+        {
+          "document_id": 62,
+          "chunk_id": 916,
+          "content": "d make predictions or decisions.Types of Machine Learning 1. Supervised Learning Supervised learning uses labeled training data to learn a mapping from inputs to outputs.The algorithm learns from exam...",
+          "filename": "machine_learning_basics.md",
+          "similarity": 0.7062553763389587
+        },
+        {
+          "document_id": 58,
+          "chunk_id": 814,
+          "content": "d make predictions or decisions.Types of Machine Learning 1. Supervised Learning Supervised learning uses labeled training data to learn a mapping from inputs to outputs.The algorithm learns from exam...",
+          "filename": "Unknown",
+          "similarity": 0.7062553763389587
+        },
+        {
+          "document_id": 54,
+          "chunk_id": 712,
+          "content": "d make predictions or decisions.Types of Machine Learning 1. Supervised Learning Supervised learning uses labeled training data to learn a mapping from inputs to outputs.The algorithm learns from exam...",
+          "filename": "Unknown",
+          "similarity": 0.7062553763389587
+        }
+      ],
+      "exact_match": false,
+      "f1_score": 0.4583333333333333,
+      "similarity_score": 0.2972972972972973,
+      "retrieval_success": true,
+      "grounding_score": 0.7062553763389587,
+      "attribution_score": 0.7075757384300232,
+      "response_time": 26.786925554275513,
+      "metadata": {
+        "rag_result": {
+          "answer": "Based on the provided context, supervised learning uses labeled training data to learn a mapping from inputs to outputs. However, the given context does not provide information about unsupervised learning or its differences from supervised learning. Therefore, I cannot answer what the difference between supervised and unsupervised learning is based solely on this context.",
+          "sources": [
+            {
+              "document_id": 62,
+              "chunk_id": 916,
+              "content": "d make predictions or decisions.Types of Machine Learning 1. Supervised Learning Supervised learning uses labeled training data to learn a mapping from inputs to outputs.The algorithm learns from exam...",
+              "filename": "machine_learning_basics.md",
+              "similarity": 0.7062553763389587
+            },
+            {
+              "document_id": 58,
+              "chunk_id": 814,
+              "content": "d make predictions or decisions.Types of Machine Learning 1. Supervised Learning Supervised learning uses labeled training data to learn a mapping from inputs to outputs.The algorithm learns from exam...",
+              "filename": "Unknown",
+              "similarity": 0.7062553763389587
+            },
+            {
+              "document_id": 54,
+              "chunk_id": 712,
+              "content": "d make predictions or decisions.Types of Machine Learning 1. Supervised Learning Supervised learning uses labeled training data to learn a mapping from inputs to outputs.The algorithm learns from exam...",
+              "filename": "Unknown",
+              "similarity": 0.7062553763389587
+            }
+          ],
+          "similarity_scores": [
+            0.7062553763389587,
+            0.7062553763389587,
+            0.7062553763389587
+          ],
+          "query_time": 26.78649115562439,
+          "retrieval_success": true,
+          "num_sources": 3
+        },
+        "attribution_metadata": {
+          "total_sentences": 3,
+          "hallucinated_sentences": 0,
+          "attribution_counts": {
+            "high": 1,
+            "medium": 2,
+            "low": 0,
+            "none": 0
+          },
+          "average_confidence": 0.7075757384300232,
+          "quality_score": 0.7075757384300232,
+          "problematic_sentences": [],
+          "attribution_summary": {
+            "high_confidence": 1,
+            "medium_confidence": 2,
+            "low_confidence": 0,
+            "no_attribution": 0
+          }
+        }
+      }
+    },
+    {
+      "question": "How does backpropagation work in neural networks?",
+      "expected_answer": "Backpropagation is an algorithm that calculates gradients of the loss function with respect to the network's weights by propagating errors backward through the network layers.",
+      "predicted_answer": "Based on the provided context, the backpropagation algorithm works by calculating and propagating gradients (error) backward through the network after an output has been compared to the expected result. This process is used to adjust the weights of the neural network in order to minimize the loss function. However, the context does not provide detailed steps or further explanation beyond these initial points.",
+      "expected_sources": [
+        "neural_networks.txt"
+      ],
+      "predicted_sources": [
+        {
+          "document_id": 63,
+          "chunk_id": 959,
+          "content": "re calculated and propagated backward through the network 4. Weight Updates: Weights are adjusted to minimize the loss function Backpropagation Algorithm Backpropagation is the key algorithm that enab...",
+          "filename": "neural_networks.txt",
+          "similarity": 0.8568015098571777
+        },
+        {
+          "document_id": 59,
+          "chunk_id": 857,
+          "content": "re calculated and propagated backward through the network 4. Weight Updates: Weights are adjusted to minimize the loss function Backpropagation Algorithm Backpropagation is the key algorithm that enab...",
+          "filename": "Unknown",
+          "similarity": 0.8568015098571777
+        },
+        {
+          "document_id": 55,
+          "chunk_id": 755,
+          "content": "re calculated and propagated backward through the network 4. Weight Updates: Weights are adjusted to minimize the loss function Backpropagation Algorithm Backpropagation is the key algorithm that enab...",
+          "filename": "Unknown",
+          "similarity": 0.8568015098571777
+        },
+        {
+          "document_id": 63,
+          "chunk_id": 956,
+          "content": "ere information flows in one direction from input to output. They consist of multiple layers of neurons, with each layer fully connected to the next.Training Process Neural networks learn through a pr...",
+          "filename": "neural_networks.txt",
+          "similarity": 0.81681889295578
+        },
+        {
+          "document_id": 59,
+          "chunk_id": 854,
+          "content": "ere information flows in one direction from input to output. They consist of multiple layers of neurons, with each layer fully connected to the next.Training Process Neural networks learn through a pr...",
+          "filename": "Unknown",
+          "similarity": 0.81681889295578
+        }
+      ],
+      "exact_match": false,
+      "f1_score": 0.3508771929824562,
+      "similarity_score": 0.2127659574468085,
+      "retrieval_success": true,
+      "grounding_score": 0.8408084630966186,
+      "attribution_score": 0.6906374394893646,
+      "response_time": 29.462653160095215,
+      "metadata": {
+        "rag_result": {
+          "answer": "Based on the provided context, the backpropagation algorithm works by calculating and propagating gradients (error) backward through the network after an output has been compared to the expected result. This process is used to adjust the weights of the neural network in order to minimize the loss function. However, the context does not provide detailed steps or further explanation beyond these initial points.",
+          "sources": [
+            {
+              "document_id": 63,
+              "chunk_id": 959,
+              "content": "re calculated and propagated backward through the network 4. Weight Updates: Weights are adjusted to minimize the loss function Backpropagation Algorithm Backpropagation is the key algorithm that enab...",
+              "filename": "neural_networks.txt",
+              "similarity": 0.8568015098571777
+            },
+            {
+              "document_id": 59,
+              "chunk_id": 857,
+              "content": "re calculated and propagated backward through the network 4. Weight Updates: Weights are adjusted to minimize the loss function Backpropagation Algorithm Backpropagation is the key algorithm that enab...",
+              "filename": "Unknown",
+              "similarity": 0.8568015098571777
+            },
+            {
+              "document_id": 55,
+              "chunk_id": 755,
+              "content": "re calculated and propagated backward through the network 4. Weight Updates: Weights are adjusted to minimize the loss function Backpropagation Algorithm Backpropagation is the key algorithm that enab...",
+              "filename": "Unknown",
+              "similarity": 0.8568015098571777
+            },
+            {
+              "document_id": 63,
+              "chunk_id": 956,
+              "content": "ere information flows in one direction from input to output. They consist of multiple layers of neurons, with each layer fully connected to the next.Training Process Neural networks learn through a pr...",
+              "filename": "neural_networks.txt",
+              "similarity": 0.81681889295578
+            },
+            {
+              "document_id": 59,
+              "chunk_id": 854,
+              "content": "ere information flows in one direction from input to output. They consist of multiple layers of neurons, with each layer fully connected to the next.Training Process Neural networks learn through a pr...",
+              "filename": "Unknown",
+              "similarity": 0.81681889295578
+            }
+          ],
+          "similarity_scores": [
+            0.8568015098571777,
+            0.8568015098571777,
+            0.8568015098571777,
+            0.81681889295578,
+            0.81681889295578
+          ],
+          "query_time": 29.462191104888916,
+          "retrieval_success": true,
+          "num_sources": 5
+        },
+        "attribution_metadata": {
+          "total_sentences": 3,
+          "hallucinated_sentences": 0,
+          "attribution_counts": {
+            "high": 2,
+            "medium": 1,
+            "low": 0,
+            "none": 0
+          },
+          "average_confidence": 0.6906374394893646,
+          "quality_score": 0.6906374394893646,
+          "problematic_sentences": [],
+          "attribution_summary": {
+            "high_confidence": 2,
+            "medium_confidence": 1,
+            "low_confidence": 0,
+            "no_attribution": 0
+          }
+        }
+      }
+    },
+    {
+      "question": "What are the main types of bias in AI systems?",
+      "expected_answer": "Main types of bias in AI include algorithmic bias, data bias, measurement bias, and selection bias, which can lead to unfair or discriminatory outcomes.",
+      "predicted_answer": "Based on the provided context, the main types of bias in AI systems are:\n\n1. Algorithmic bias: Bias introduced through the design of AI algorithms.\n2. Data bias: Bias present in the training datasets used to build AI systems.\n3. Measurement bias: Bias arising from how outcomes are measured and evaluated.\n4. Selection bias: Bias introduced through the selection of training data.\n\nSources 1, 2, 3, and 5 all list these same four types of bias. Source 4 does not add any new information regarding types of bias but discusses privacy and data protection issues related to AI systems.",
+      "expected_sources": [
+        "ai_ethics.md"
+      ],
+      "predicted_sources": [
+        {
+          "document_id": 60,
+          "chunk_id": 882,
+          "content": "is can lead to unfair outcomes for certain groups of people. Common types of bias include: Algorithmic bias: Bias introduced through the design of AI algorithms Data bias: Bias present in the training...",
+          "filename": "ai_ethics.md",
+          "similarity": 0.8974624872207642
+        },
+        {
+          "document_id": 56,
+          "chunk_id": 780,
+          "content": "is can lead to unfair outcomes for certain groups of people. Common types of bias include: Algorithmic bias: Bias introduced through the design of AI algorithms Data bias: Bias present in the training...",
+          "filename": "Unknown",
+          "similarity": 0.8974624872207642
+        },
+        {
+          "document_id": 52,
+          "chunk_id": 677,
+          "content": "is can lead to unfair outcomes for certain groups of people. Common types of bias include: Algorithmic bias: Bias introduced through the design of AI algorithms Data bias: Bias present in the training...",
+          "filename": "Unknown",
+          "similarity": 0.8974624872207642
+        },
+        {
+          "document_id": 56,
+          "chunk_id": 781,
+          "content": "s: Bias introduced through the selection of training data 2. Privacy and Data Protection AI systems often require large amounts of personal data to function effectively.",
+          "filename": "Unknown",
+          "similarity": 0.78856360912323
+        },
+        {
+          "document_id": 52,
+          "chunk_id": 678,
+          "content": "s: Bias introduced through the selection of training data 2. Privacy and Data Protection AI systems often require large amounts of personal data to function effectively.",
+          "filename": "Unknown",
+          "similarity": 0.78856360912323
+        }
+      ],
+      "exact_match": false,
+      "f1_score": 0.26865671641791045,
+      "similarity_score": 0.15517241379310345,
+      "retrieval_success": true,
+      "grounding_score": 0.8539029359817505,
+      "attribution_score": 0.8327463297616867,
+      "response_time": 34.184086561203,
+      "metadata": {
+        "rag_result": {
+          "answer": "Based on the provided context, the main types of bias in AI systems are:\n\n1. Algorithmic bias: Bias introduced through the design of AI algorithms.\n2. Data bias: Bias present in the training datasets used to build AI systems.\n3. Measurement bias: Bias arising from how outcomes are measured and evaluated.\n4. Selection bias: Bias introduced through the selection of training data.\n\nSources 1, 2, 3, and 5 all list these same four types of bias. Source 4 does not add any new information regarding types of bias but discusses privacy and data protection issues related to AI systems.",
+          "sources": [
+            {
+              "document_id": 60,
+              "chunk_id": 882,
+              "content": "is can lead to unfair outcomes for certain groups of people. Common types of bias include: Algorithmic bias: Bias introduced through the design of AI algorithms Data bias: Bias present in the training...",
+              "filename": "ai_ethics.md",
+              "similarity": 0.8974624872207642
+            },
+            {
+              "document_id": 56,
+              "chunk_id": 780,
+              "content": "is can lead to unfair outcomes for certain groups of people. Common types of bias include: Algorithmic bias: Bias introduced through the design of AI algorithms Data bias: Bias present in the training...",
+              "filename": "Unknown",
+              "similarity": 0.8974624872207642
+            },
+            {
+              "document_id": 52,
+              "chunk_id": 677,
+              "content": "is can lead to unfair outcomes for certain groups of people. Common types of bias include: Algorithmic bias: Bias introduced through the design of AI algorithms Data bias: Bias present in the training...",
+              "filename": "Unknown",
+              "similarity": 0.8974624872207642
+            },
+            {
+              "document_id": 56,
+              "chunk_id": 781,
+              "content": "s: Bias introduced through the selection of training data 2. Privacy and Data Protection AI systems often require large amounts of personal data to function effectively.",
+              "filename": "Unknown",
+              "similarity": 0.78856360912323
+            },
+            {
+              "document_id": 52,
+              "chunk_id": 678,
+              "content": "s: Bias introduced through the selection of training data 2. Privacy and Data Protection AI systems often require large amounts of personal data to function effectively.",
+              "filename": "Unknown",
+              "similarity": 0.78856360912323
+            }
+          ],
+          "similarity_scores": [
+            0.8974624872207642,
+            0.8974624872207642,
+            0.8974624872207642,
+            0.78856360912323,
+            0.78856360912323
+          ],
+          "query_time": 34.18373489379883,
+          "retrieval_success": true,
+          "num_sources": 5
+        },
+        "attribution_metadata": {
+          "total_sentences": 7,
+          "hallucinated_sentences": 0,
+          "attribution_counts": {
+            "high": 7,
+            "medium": 0,
+            "low": 0,
+            "none": 0
+          },
+          "average_confidence": 0.8327463297616867,
+          "quality_score": 0.8327463297616867,
+          "problematic_sentences": [],
+          "attribution_summary": {
+            "high_confidence": 7,
+            "medium_confidence": 0,
+            "low_confidence": 0,
+            "no_attribution": 0
+          }
+        }
+      }
+    },
+    {
+      "question": "What is gradient descent?",
+      "expected_answer": "Gradient descent is an optimization algorithm used to minimize the cost function in machine learning by iteratively adjusting parameters in the direction of steepest descent.",
+      "predicted_answer": "I couldn't find relevant information to answer your question.",
+      "expected_sources": [
+        "machine_learning_basics.md"
+      ],
+      "predicted_sources": [],
+      "exact_match": false,
+      "f1_score": 0.0,
+      "similarity_score": 0.0,
+      "retrieval_success": false,
+      "grounding_score": 0.0,
+      "attribution_score": 0.0,
+      "response_time": 0.4629049301147461,
+      "metadata": {
+        "rag_result": {
+          "answer": "I couldn't find relevant information to answer your question.",
+          "sources": [],
+          "similarity_scores": [],
+          "query_time": 0.462810754776001,
+          "retrieval_success": false
+        },
+        "attribution_metadata": {}
+      }
+    },
+    {
+      "question": "How can AI systems be made more transparent?",
+      "expected_answer": "AI systems can be made more transparent through explainable AI techniques, clear documentation, interpretable models, and providing reasoning for decisions.",
+      "predicted_answer": "AI systems can be made more transparent by documenting system capabilities and limitations, providing explanations for decisions when feasible, making source code and methodologies publicly available, and clear communication about system performance and reliability.",
+      "expected_sources": [
+        "ai_ethics.md"
+      ],
+      "predicted_sources": [
+        {
+          "document_id": 60,
+          "chunk_id": 893,
+          "content": "g privacy-preserving techniques like differential privacy 4. Transparency and Interpretability AI systems should be as transparent as possible: Documenting system capabilities and limitations Providin...",
+          "filename": "ai_ethics.md",
+          "similarity": 0.8288790583610535
+        },
+        {
+          "document_id": 56,
+          "chunk_id": 791,
+          "content": "g privacy-preserving techniques like differential privacy 4. Transparency and Interpretability AI systems should be as transparent as possible: Documenting system capabilities and limitations Providin...",
+          "filename": "Unknown",
+          "similarity": 0.8288790583610535
+        },
+        {
+          "document_id": 52,
+          "chunk_id": 688,
+          "content": "g privacy-preserving techniques like differential privacy 4. Transparency and Interpretability AI systems should be as transparent as possible: Documenting system capabilities and limitations Providin...",
+          "filename": "Unknown",
+          "similarity": 0.8288790583610535
+        },
+        {
+          "document_id": 60,
+          "chunk_id": 885,
+          "content": "and protection Potential for surveillance and monitoring 3. Transparency and Explainability Many AI systems, particularly deep learning models, operate as \"black boxes\" where the decision-making proce...",
+          "filename": "ai_ethics.md",
+          "similarity": 0.762955904006958
+        },
+        {
+          "document_id": 56,
+          "chunk_id": 783,
+          "content": "and protection Potential for surveillance and monitoring 3. Transparency and Explainability Many AI systems, particularly deep learning models, operate as \"black boxes\" where the decision-making proce...",
+          "filename": "Unknown",
+          "similarity": 0.762955904006958
+        }
+      ],
+      "exact_match": false,
+      "f1_score": 0.4285714285714286,
+      "similarity_score": 0.2727272727272727,
+      "retrieval_success": true,
+      "grounding_score": 0.8025097966194152,
+      "attribution_score": 0.8668507933616638,
+      "response_time": 25.362432718276978,
+      "metadata": {
+        "rag_result": {
+          "answer": "AI systems can be made more transparent by documenting system capabilities and limitations, providing explanations for decisions when feasible, making source code and methodologies publicly available, and clear communication about system performance and reliability.",
+          "sources": [
+            {
+              "document_id": 60,
+              "chunk_id": 893,
+              "content": "g privacy-preserving techniques like differential privacy 4. Transparency and Interpretability AI systems should be as transparent as possible: Documenting system capabilities and limitations Providin...",
+              "filename": "ai_ethics.md",
+              "similarity": 0.8288790583610535
+            },
+            {
+              "document_id": 56,
+              "chunk_id": 791,
+              "content": "g privacy-preserving techniques like differential privacy 4. Transparency and Interpretability AI systems should be as transparent as possible: Documenting system capabilities and limitations Providin...",
+              "filename": "Unknown",
+              "similarity": 0.8288790583610535
+            },
+            {
+              "document_id": 52,
+              "chunk_id": 688,
+              "content": "g privacy-preserving techniques like differential privacy 4. Transparency and Interpretability AI systems should be as transparent as possible: Documenting system capabilities and limitations Providin...",
+              "filename": "Unknown",
+              "similarity": 0.8288790583610535
+            },
+            {
+              "document_id": 60,
+              "chunk_id": 885,
+              "content": "and protection Potential for surveillance and monitoring 3. Transparency and Explainability Many AI systems, particularly deep learning models, operate as \"black boxes\" where the decision-making proce...",
+              "filename": "ai_ethics.md",
+              "similarity": 0.762955904006958
+            },
+            {
+              "document_id": 56,
+              "chunk_id": 783,
+              "content": "and protection Potential for surveillance and monitoring 3. Transparency and Explainability Many AI systems, particularly deep learning models, operate as \"black boxes\" where the decision-making proce...",
+              "filename": "Unknown",
+              "similarity": 0.762955904006958
+            }
+          ],
+          "similarity_scores": [
+            0.8288790583610535,
+            0.8288790583610535,
+            0.8288790583610535,
+            0.762955904006958,
+            0.762955904006958
+          ],
+          "query_time": 25.36215090751648,
+          "retrieval_success": true,
+          "num_sources": 5
+        },
+        "attribution_metadata": {
+          "total_sentences": 1,
+          "hallucinated_sentences": 0,
+          "attribution_counts": {
+            "high": 1,
+            "medium": 0,
+            "low": 0,
+            "none": 0
+          },
+          "average_confidence": 0.8668507933616638,
+          "quality_score": 0.8668507933616638,
+          "problematic_sentences": [],
+          "attribution_summary": {
+            "high_confidence": 1,
+            "medium_confidence": 0,
+            "low_confidence": 0,
+            "no_attribution": 0
+          }
+        }
+      }
+    },
+    {
+      "question": "What is a convolutional neural network?",
+      "expected_answer": "A convolutional neural network (CNN) is a deep learning architecture particularly effective for image processing, using convolutional layers to detect spatial patterns and features.",
+      "predicted_answer": "Based on the provided context, a Convolutional Neural Network (CNN) is particularly effective for image processing tasks. It uses convolutional layers that apply filters to detect spatial patterns and features. However, the context does not provide a more detailed explanation of what CNNs are or how they function beyond these points.",
+      "expected_sources": [
+        "neural_networks.txt"
+      ],
+      "predicted_sources": [
+        {
+          "document_id": 63,
+          "chunk_id": 961,
+          "content": "3.Updating weights in the direction that reduces the loss 4. Repeating this process until the network converges Types of Neural Networks Convolutional Neural Networks (CNNs) CNNs are particularly effe...",
+          "filename": "neural_networks.txt",
+          "similarity": 0.7352935075759888
+        },
+        {
+          "document_id": 59,
+          "chunk_id": 859,
+          "content": "3.Updating weights in the direction that reduces the loss 4. Repeating this process until the network converges Types of Neural Networks Convolutional Neural Networks (CNNs) CNNs are particularly effe...",
+          "filename": "Unknown",
+          "similarity": 0.7352935075759888
+        },
+        {
+          "document_id": 55,
+          "chunk_id": 757,
+          "content": "3.Updating weights in the direction that reduces the loss 4. Repeating this process until the network converges Types of Neural Networks Convolutional Neural Networks (CNNs) CNNs are particularly effe...",
+          "filename": "Unknown",
+          "similarity": 0.7352935075759888
+        },
+        {
+          "document_id": 59,
+          "chunk_id": 860,
+          "content": "CNNs are particularly effective for image processing tasks. They use convolutional layers that apply filters to detect spatial patterns and features.",
+          "filename": "Unknown",
+          "similarity": 0.7174258232116699
+        },
+        {
+          "document_id": 55,
+          "chunk_id": 758,
+          "content": "CNNs are particularly effective for image processing tasks. They use convolutional layers that apply filters to detect spatial patterns and features.",
+          "filename": "Unknown",
+          "similarity": 0.7174258232116699
+        }
+      ],
+      "exact_match": false,
+      "f1_score": 0.490566037735849,
+      "similarity_score": 0.325,
+      "retrieval_success": true,
+      "grounding_score": 0.7281464338302612,
+      "attribution_score": 0.7902432216538323,
+      "response_time": 27.212750911712646,
+      "metadata": {
+        "rag_result": {
+          "answer": "Based on the provided context, a Convolutional Neural Network (CNN) is particularly effective for image processing tasks. It uses convolutional layers that apply filters to detect spatial patterns and features. However, the context does not provide a more detailed explanation of what CNNs are or how they function beyond these points.",
+          "sources": [
+            {
+              "document_id": 63,
+              "chunk_id": 961,
+              "content": "3.Updating weights in the direction that reduces the loss 4. Repeating this process until the network converges Types of Neural Networks Convolutional Neural Networks (CNNs) CNNs are particularly effe...",
+              "filename": "neural_networks.txt",
+              "similarity": 0.7352935075759888
+            },
+            {
+              "document_id": 59,
+              "chunk_id": 859,
+              "content": "3.Updating weights in the direction that reduces the loss 4. Repeating this process until the network converges Types of Neural Networks Convolutional Neural Networks (CNNs) CNNs are particularly effe...",
+              "filename": "Unknown",
+              "similarity": 0.7352935075759888
+            },
+            {
+              "document_id": 55,
+              "chunk_id": 757,
+              "content": "3.Updating weights in the direction that reduces the loss 4. Repeating this process until the network converges Types of Neural Networks Convolutional Neural Networks (CNNs) CNNs are particularly effe...",
+              "filename": "Unknown",
+              "similarity": 0.7352935075759888
+            },
+            {
+              "document_id": 59,
+              "chunk_id": 860,
+              "content": "CNNs are particularly effective for image processing tasks. They use convolutional layers that apply filters to detect spatial patterns and features.",
+              "filename": "Unknown",
+              "similarity": 0.7174258232116699
+            },
+            {
+              "document_id": 55,
+              "chunk_id": 758,
+              "content": "CNNs are particularly effective for image processing tasks. They use convolutional layers that apply filters to detect spatial patterns and features.",
+              "filename": "Unknown",
+              "similarity": 0.7174258232116699
+            }
+          ],
+          "similarity_scores": [
+            0.7352935075759888,
+            0.7352935075759888,
+            0.7352935075759888,
+            0.7174258232116699,
+            0.7174258232116699
+          ],
+          "query_time": 27.21238088607788,
+          "retrieval_success": true,
+          "num_sources": 5
+        },
+        "attribution_metadata": {
+          "total_sentences": 3,
+          "hallucinated_sentences": 0,
+          "attribution_counts": {
+            "high": 3,
+            "medium": 0,
+            "low": 0,
+            "none": 0
+          },
+          "average_confidence": 0.7902432216538323,
+          "quality_score": 0.7902432216538323,
+          "problematic_sentences": [],
+          "attribution_summary": {
+            "high_confidence": 3,
+            "medium_confidence": 0,
+            "low_confidence": 0,
+            "no_attribution": 0
+          }
+        }
+      }
+    },
+    {
+      "question": "What are the challenges of AI regulation?",
+      "expected_answer": "AI regulation challenges include keeping pace with rapid technological advances, balancing innovation with safety, addressing global coordination, and defining accountability frameworks.",
+      "predicted_answer": "The key challenges of AI regulation based on the provided context include:\n\n1. Keeping pace with rapid technological advances: Regulations must be flexible enough to adapt to new developments while providing necessary protections.\n2. Legal and regulatory compliance issues.\n3. Determining accountability and responsibility, particularly in cases involving multiple parties, autonomous systems, significant real-world consequences, and harm due to AI failures.",
+      "expected_sources": [
+        "ai_ethics.md"
+      ],
+      "predicted_sources": [
+        {
+          "document_id": 60,
+          "chunk_id": 894,
+          "content": "ar communication about system performance and reliability 5. Robustness and Safety AI systems should be reliable and safe: Thorough testing under various conditions Robustness to adversarial attacks G...",
+          "filename": "ai_ethics.md",
+          "similarity": 0.8239409327507019
+        },
+        {
+          "document_id": 56,
+          "chunk_id": 792,
+          "content": "ar communication about system performance and reliability 5. Robustness and Safety AI systems should be reliable and safe: Thorough testing under various conditions Robustness to adversarial attacks G...",
+          "filename": "Unknown",
+          "similarity": 0.8239409327507019
+        },
+        {
+          "document_id": 52,
+          "chunk_id": 689,
+          "content": "ar communication about system performance and reliability 5. Robustness and Safety AI systems should be reliable and safe: Thorough testing under various conditions Robustness to adversarial attacks G...",
+          "filename": "Unknown",
+          "similarity": 0.8239409327507019
+        },
+        {
+          "document_id": 60,
+          "chunk_id": 887,
+          "content": "s and stakeholders Legal and regulatory compliance issues 4. Accountability and Responsibility Determining who is responsible for AI system decisions and outcomes can be complex, especially when: Mult...",
+          "filename": "ai_ethics.md",
+          "similarity": 0.7735248804092407
+        },
+        {
+          "document_id": 56,
+          "chunk_id": 785,
+          "content": "s and stakeholders Legal and regulatory compliance issues 4. Accountability and Responsibility Determining who is responsible for AI system decisions and outcomes can be complex, especially when: Mult...",
+          "filename": "Unknown",
+          "similarity": 0.7735248804092407
+        }
+      ],
+      "exact_match": false,
+      "f1_score": 0.30303030303030304,
+      "similarity_score": 0.17857142857142858,
+      "retrieval_success": true,
+      "grounding_score": 0.8037745118141174,
+      "attribution_score": 0.6882943647603195,
+      "response_time": 31.881972551345825,
+      "metadata": {
+        "rag_result": {
+          "answer": "The key challenges of AI regulation based on the provided context include:\n\n1. Keeping pace with rapid technological advances: Regulations must be flexible enough to adapt to new developments while providing necessary protections.\n2. Legal and regulatory compliance issues.\n3. Determining accountability and responsibility, particularly in cases involving multiple parties, autonomous systems, significant real-world consequences, and harm due to AI failures.",
+          "sources": [
+            {
+              "document_id": 60,
+              "chunk_id": 894,
+              "content": "ar communication about system performance and reliability 5. Robustness and Safety AI systems should be reliable and safe: Thorough testing under various conditions Robustness to adversarial attacks G...",
+              "filename": "ai_ethics.md",
+              "similarity": 0.8239409327507019
+            },
+            {
+              "document_id": 56,
+              "chunk_id": 792,
+              "content": "ar communication about system performance and reliability 5. Robustness and Safety AI systems should be reliable and safe: Thorough testing under various conditions Robustness to adversarial attacks G...",
+              "filename": "Unknown",
+              "similarity": 0.8239409327507019
+            },
+            {
+              "document_id": 52,
+              "chunk_id": 689,
+              "content": "ar communication about system performance and reliability 5. Robustness and Safety AI systems should be reliable and safe: Thorough testing under various conditions Robustness to adversarial attacks G...",
+              "filename": "Unknown",
+              "similarity": 0.8239409327507019
+            },
+            {
+              "document_id": 60,
+              "chunk_id": 887,
+              "content": "s and stakeholders Legal and regulatory compliance issues 4. Accountability and Responsibility Determining who is responsible for AI system decisions and outcomes can be complex, especially when: Mult...",
+              "filename": "ai_ethics.md",
+              "similarity": 0.7735248804092407
+            },
+            {
+              "document_id": 56,
+              "chunk_id": 785,
+              "content": "s and stakeholders Legal and regulatory compliance issues 4. Accountability and Responsibility Determining who is responsible for AI system decisions and outcomes can be complex, especially when: Mult...",
+              "filename": "Unknown",
+              "similarity": 0.7735248804092407
+            }
+          ],
+          "similarity_scores": [
+            0.8239409327507019,
+            0.8239409327507019,
+            0.8239409327507019,
+            0.7735248804092407,
+            0.7735248804092407
+          ],
+          "query_time": 31.88143515586853,
+          "retrieval_success": true,
+          "num_sources": 5
+        },
+        "attribution_metadata": {
+          "total_sentences": 4,
+          "hallucinated_sentences": 0,
+          "attribution_counts": {
+            "high": 2,
+            "medium": 2,
+            "low": 0,
+            "none": 0
+          },
+          "average_confidence": 0.6882943647603195,
+          "quality_score": 0.6882943647603195,
+          "problematic_sentences": [],
+          "attribution_summary": {
+            "high_confidence": 2,
+            "medium_confidence": 2,
+            "low_confidence": 0,
+            "no_attribution": 0
+          }
+        }
+      }
+    },
+    {
+      "question": "Explain the concept of regularization in machine learning.",
+      "expected_answer": "Regularization is a technique used to prevent overfitting by adding a penalty term to the loss function, encouraging simpler models with smaller parameter values.",
+      "predicted_answer": "Regularization in machine learning is a technique used to prevent overfitting by adding a penalty term to the loss function, which encourages simpler models with smaller parameter values. Common types include L1 regularization (Lasso), which adds the sum of absolute values of parameters; L2 regularization (Ridge), which adds the sum of squared parameters; and Elastic net, which combines both L1 and L2 methods. Dropout is another form of regularization specifically for neural networks that randomly sets some neurons to zero during training.",
+      "expected_sources": [
+        "machine_learning_basics.md"
+      ],
+      "predicted_sources": [
+        {
+          "document_id": 62,
+          "chunk_id": 925,
+          "content": "his encourages simpler models with smaller parameter values. Types of regularization: - L1 regularization (Lasso): Adds sum of absolute values of parameters - L2 regularization (Ridge): Adds sum of sq...",
+          "filename": "machine_learning_basics.md",
+          "similarity": 0.7527183294296265
+        },
+        {
+          "document_id": 58,
+          "chunk_id": 823,
+          "content": "his encourages simpler models with smaller parameter values. Types of regularization: - L1 regularization (Lasso): Adds sum of absolute values of parameters - L2 regularization (Ridge): Adds sum of sq...",
+          "filename": "Unknown",
+          "similarity": 0.7527183294296265
+        },
+        {
+          "document_id": 54,
+          "chunk_id": 721,
+          "content": "his encourages simpler models with smaller parameter values. Types of regularization: - L1 regularization (Lasso): Adds sum of absolute values of parameters - L2 regularization (Ridge): Adds sum of sq...",
+          "filename": "Unknown",
+          "similarity": 0.7527183294296265
+        },
+        {
+          "document_id": 62,
+          "chunk_id": 914,
+          "content": "Machine Learning Fundamentals Introduction Machine learning is a subset of artificial intelligence (AI) that enables computers to learn and improve from experience without being explicitly programmed.",
+          "filename": "machine_learning_basics.md",
+          "similarity": 0.739679217338562
+        },
+        {
+          "document_id": 58,
+          "chunk_id": 812,
+          "content": "Machine Learning Fundamentals Introduction Machine learning is a subset of artificial intelligence (AI) that enables computers to learn and improve from experience without being explicitly programmed.",
+          "filename": "Unknown",
+          "similarity": 0.739679217338562
+        }
+      ],
+      "exact_match": false,
+      "f1_score": 0.46153846153846156,
+      "similarity_score": 0.3,
+      "retrieval_success": true,
+      "grounding_score": 0.7475026845932007,
+      "attribution_score": 0.7687640885512034,
+      "response_time": 32.55088758468628,
+      "metadata": {
+        "rag_result": {
+          "answer": "Regularization in machine learning is a technique used to prevent overfitting by adding a penalty term to the loss function, which encourages simpler models with smaller parameter values. Common types include L1 regularization (Lasso), which adds the sum of absolute values of parameters; L2 regularization (Ridge), which adds the sum of squared parameters; and Elastic net, which combines both L1 and L2 methods. Dropout is another form of regularization specifically for neural networks that randomly sets some neurons to zero during training.",
+          "sources": [
+            {
+              "document_id": 62,
+              "chunk_id": 925,
+              "content": "his encourages simpler models with smaller parameter values. Types of regularization: - L1 regularization (Lasso): Adds sum of absolute values of parameters - L2 regularization (Ridge): Adds sum of sq...",
+              "filename": "machine_learning_basics.md",
+              "similarity": 0.7527183294296265
+            },
+            {
+              "document_id": 58,
+              "chunk_id": 823,
+              "content": "his encourages simpler models with smaller parameter values. Types of regularization: - L1 regularization (Lasso): Adds sum of absolute values of parameters - L2 regularization (Ridge): Adds sum of sq...",
+              "filename": "Unknown",
+              "similarity": 0.7527183294296265
+            },
+            {
+              "document_id": 54,
+              "chunk_id": 721,
+              "content": "his encourages simpler models with smaller parameter values. Types of regularization: - L1 regularization (Lasso): Adds sum of absolute values of parameters - L2 regularization (Ridge): Adds sum of sq...",
+              "filename": "Unknown",
+              "similarity": 0.7527183294296265
+            },
+            {
+              "document_id": 62,
+              "chunk_id": 914,
+              "content": "Machine Learning Fundamentals Introduction Machine learning is a subset of artificial intelligence (AI) that enables computers to learn and improve from experience without being explicitly programmed.",
+              "filename": "machine_learning_basics.md",
+              "similarity": 0.739679217338562
+            },
+            {
+              "document_id": 58,
+              "chunk_id": 812,
+              "content": "Machine Learning Fundamentals Introduction Machine learning is a subset of artificial intelligence (AI) that enables computers to learn and improve from experience without being explicitly programmed.",
+              "filename": "Unknown",
+              "similarity": 0.739679217338562
+            }
+          ],
+          "similarity_scores": [
+            0.7527183294296265,
+            0.7527183294296265,
+            0.7527183294296265,
+            0.739679217338562,
+            0.739679217338562
+          ],
+          "query_time": 32.55052471160889,
+          "retrieval_success": true,
+          "num_sources": 5
+        },
+        "attribution_metadata": {
+          "total_sentences": 3,
+          "hallucinated_sentences": 0,
+          "attribution_counts": {
+            "high": 2,
+            "medium": 1,
+            "low": 0,
+            "none": 0
+          },
+          "average_confidence": 0.7687640885512034,
+          "quality_score": 0.7687640885512034,
+          "problematic_sentences": [],
+          "attribution_summary": {
+            "high_confidence": 2,
+            "medium_confidence": 1,
+            "low_confidence": 0,
+            "no_attribution": 0
+          }
+        }
+      }
+    },
+    {
+      "question": "What is transfer learning?",
+      "expected_answer": "Transfer learning is a machine learning technique where a model trained on one task is reused as a starting point for a related task, leveraging previously learned features.",
+      "predicted_answer": "Transfer learning is a machine learning technique where a model trained on one task is reused as a starting point for a related task.",
+      "expected_sources": [
+        "machine_learning_basics.md"
+      ],
+      "predicted_sources": [
+        {
+          "document_id": 62,
+          "chunk_id": 935,
+          "content": "ons 2.Calculate loss 3.Backward pass: Calculate gradients 4. Update weights using gradients Transfer Learning Transfer learning is a machine learning technique where a model trained on one task is reu...",
+          "filename": "machine_learning_basics.md",
+          "similarity": 0.7732350826263428
+        },
+        {
+          "document_id": 58,
+          "chunk_id": 833,
+          "content": "ons 2.Calculate loss 3.Backward pass: Calculate gradients 4. Update weights using gradients Transfer Learning Transfer learning is a machine learning technique where a model trained on one task is reu...",
+          "filename": "Unknown",
+          "similarity": 0.7732350826263428
+        },
+        {
+          "document_id": 54,
+          "chunk_id": 731,
+          "content": "ons 2.Calculate loss 3.Backward pass: Calculate gradients 4. Update weights using gradients Transfer Learning Transfer learning is a machine learning technique where a model trained on one task is reu...",
+          "filename": "Unknown",
+          "similarity": 0.7732350826263428
+        }
+      ],
+      "exact_match": false,
+      "f1_score": 0.8666666666666666,
+      "similarity_score": 0.7647058823529411,
+      "retrieval_success": true,
+      "grounding_score": 0.7732350826263428,
+      "attribution_score": 0.8260848522186279,
+      "response_time": 23.11152982711792,
+      "metadata": {
+        "rag_result": {
+          "answer": "Transfer learning is a machine learning technique where a model trained on one task is reused as a starting point for a related task.",
+          "sources": [
+            {
+              "document_id": 62,
+              "chunk_id": 935,
+              "content": "ons 2.Calculate loss 3.Backward pass: Calculate gradients 4. Update weights using gradients Transfer Learning Transfer learning is a machine learning technique where a model trained on one task is reu...",
+              "filename": "machine_learning_basics.md",
+              "similarity": 0.7732350826263428
+            },
+            {
+              "document_id": 58,
+              "chunk_id": 833,
+              "content": "ons 2.Calculate loss 3.Backward pass: Calculate gradients 4. Update weights using gradients Transfer Learning Transfer learning is a machine learning technique where a model trained on one task is reu...",
+              "filename": "Unknown",
+              "similarity": 0.7732350826263428
+            },
+            {
+              "document_id": 54,
+              "chunk_id": 731,
+              "content": "ons 2.Calculate loss 3.Backward pass: Calculate gradients 4. Update weights using gradients Transfer Learning Transfer learning is a machine learning technique where a model trained on one task is reu...",
+              "filename": "Unknown",
+              "similarity": 0.7732350826263428
+            }
+          ],
+          "similarity_scores": [
+            0.7732350826263428,
+            0.7732350826263428,
+            0.7732350826263428
+          ],
+          "query_time": 23.111271858215332,
+          "retrieval_success": true,
+          "num_sources": 3
+        },
+        "attribution_metadata": {
+          "total_sentences": 1,
+          "hallucinated_sentences": 0,
+          "attribution_counts": {
+            "high": 1,
+            "medium": 0,
+            "low": 0,
+            "none": 0
+          },
+          "average_confidence": 0.8260848522186279,
+          "quality_score": 0.8260848522186279,
+          "problematic_sentences": [],
+          "attribution_summary": {
+            "high_confidence": 1,
+            "medium_confidence": 0,
+            "low_confidence": 0,
+            "no_attribution": 0
+          }
+        }
+      }
+    },
+    {
+      "question": "How do recurrent neural networks process sequential data?",
+      "expected_answer": "Recurrent neural networks (RNNs) process sequential data by maintaining hidden states that carry information from previous time steps, allowing them to capture temporal dependencies.",
+      "predicted_answer": "Recurrent Neural Networks (RNNs) process sequential data by maintaining hidden states that carry information from previous time steps.",
+      "expected_sources": [
+        "neural_networks.txt"
+      ],
+      "predicted_sources": [
+        {
+          "document_id": 63,
+          "chunk_id": 964,
+          "content": "ge classification, object detection, and facial recognition. Recurrent Neural Networks (RNNs) RNNs are designed to process sequential data by maintaining hidden states that carry information from prev...",
+          "filename": "neural_networks.txt",
+          "similarity": 0.8003153800964355
+        },
+        {
+          "document_id": 59,
+          "chunk_id": 862,
+          "content": "ge classification, object detection, and facial recognition. Recurrent Neural Networks (RNNs) RNNs are designed to process sequential data by maintaining hidden states that carry information from prev...",
+          "filename": "Unknown",
+          "similarity": 0.8003153800964355
+        },
+        {
+          "document_id": 55,
+          "chunk_id": 760,
+          "content": "ge classification, object detection, and facial recognition. Recurrent Neural Networks (RNNs) RNNs are designed to process sequential data by maintaining hidden states that carry information from prev...",
+          "filename": "Unknown",
+          "similarity": 0.8003153800964355
+        },
+        {
+          "document_id": 59,
+          "chunk_id": 867,
+          "content": "rning refers to neural networks with multiple hidden layers. The depth of these networks allows them to learn increasingly complex and abstract features.",
+          "filename": "Unknown",
+          "similarity": 0.7056622505187988
+        },
+        {
+          "document_id": 55,
+          "chunk_id": 765,
+          "content": "rning refers to neural networks with multiple hidden layers. The depth of these networks allows them to learn increasingly complex and abstract features.",
+          "filename": "Unknown",
+          "similarity": 0.7056622505187988
+        }
+      ],
+      "exact_match": false,
+      "f1_score": 0.8571428571428571,
+      "similarity_score": 0.75,
+      "retrieval_success": true,
+      "grounding_score": 0.7624541282653808,
+      "attribution_score": 0.8636577129364014,
+      "response_time": 23.76295828819275,
+      "metadata": {
+        "rag_result": {
+          "answer": "Recurrent Neural Networks (RNNs) process sequential data by maintaining hidden states that carry information from previous time steps.",
+          "sources": [
+            {
+              "document_id": 63,
+              "chunk_id": 964,
+              "content": "ge classification, object detection, and facial recognition. Recurrent Neural Networks (RNNs) RNNs are designed to process sequential data by maintaining hidden states that carry information from prev...",
+              "filename": "neural_networks.txt",
+              "similarity": 0.8003153800964355
+            },
+            {
+              "document_id": 59,
+              "chunk_id": 862,
+              "content": "ge classification, object detection, and facial recognition. Recurrent Neural Networks (RNNs) RNNs are designed to process sequential data by maintaining hidden states that carry information from prev...",
+              "filename": "Unknown",
+              "similarity": 0.8003153800964355
+            },
+            {
+              "document_id": 55,
+              "chunk_id": 760,
+              "content": "ge classification, object detection, and facial recognition. Recurrent Neural Networks (RNNs) RNNs are designed to process sequential data by maintaining hidden states that carry information from prev...",
+              "filename": "Unknown",
+              "similarity": 0.8003153800964355
+            },
+            {
+              "document_id": 59,
+              "chunk_id": 867,
+              "content": "rning refers to neural networks with multiple hidden layers. The depth of these networks allows them to learn increasingly complex and abstract features.",
+              "filename": "Unknown",
+              "similarity": 0.7056622505187988
+            },
+            {
+              "document_id": 55,
+              "chunk_id": 765,
+              "content": "rning refers to neural networks with multiple hidden layers. The depth of these networks allows them to learn increasingly complex and abstract features.",
+              "filename": "Unknown",
+              "similarity": 0.7056622505187988
+            }
+          ],
+          "similarity_scores": [
+            0.8003153800964355,
+            0.8003153800964355,
+            0.8003153800964355,
+            0.7056622505187988,
+            0.7056622505187988
+          ],
+          "query_time": 23.762611389160156,
+          "retrieval_success": true,
+          "num_sources": 5
+        },
+        "attribution_metadata": {
+          "total_sentences": 1,
+          "hallucinated_sentences": 0,
+          "attribution_counts": {
+            "high": 1,
+            "medium": 0,
+            "low": 0,
+            "none": 0
+          },
+          "average_confidence": 0.8636577129364014,
+          "quality_score": 0.8636577129364014,
+          "problematic_sentences": [],
+          "attribution_summary": {
+            "high_confidence": 1,
+            "medium_confidence": 0,
+            "low_confidence": 0,
+            "no_attribution": 0
+          }
+        }
+      }
+    },
+    {
+      "question": "What is the importance of data quality in AI systems?",
+      "expected_answer": "Data quality is crucial in AI systems as poor quality data leads to biased models, inaccurate predictions, and unreliable outcomes. High-quality data ensures better model performance and fairness.",
+      "predicted_answer": "The importance of data quality in AI systems is high because poor quality data can lead to biased models, inaccurate predictions, and unreliable outcomes, which are crucial factors for machine learning success.",
+      "expected_sources": [
+        "ai_ethics.md",
+        "machine_learning_basics.md"
+      ],
+      "predicted_sources": [
+        {
+          "document_id": 62,
+          "chunk_id": 938,
+          "content": "uality Data quality is crucial for machine learning success. Poor quality data leads to biased models, inaccurate predictions, and unreliable outcomes.",
+          "filename": "machine_learning_basics.md",
+          "similarity": 0.7751547694206238
+        },
+        {
+          "document_id": 58,
+          "chunk_id": 836,
+          "content": "uality Data quality is crucial for machine learning success. Poor quality data leads to biased models, inaccurate predictions, and unreliable outcomes.",
+          "filename": "Unknown",
+          "similarity": 0.7751547694206238
+        },
+        {
+          "document_id": 54,
+          "chunk_id": 734,
+          "content": "uality Data quality is crucial for machine learning success. Poor quality data leads to biased models, inaccurate predictions, and unreliable outcomes.",
+          "filename": "Unknown",
+          "similarity": 0.7751547694206238
+        },
+        {
+          "document_id": 60,
+          "chunk_id": 883,
+          "content": "s: Bias introduced through the selection of training data 2. Privacy and Data Protection AI systems often require large amounts of personal data to function effectively.",
+          "filename": "ai_ethics.md",
+          "similarity": 0.7372920513153076
+        },
+        {
+          "document_id": 56,
+          "chunk_id": 781,
+          "content": "s: Bias introduced through the selection of training data 2. Privacy and Data Protection AI systems often require large amounts of personal data to function effectively.",
+          "filename": "Unknown",
+          "similarity": 0.7372920513153076
+        }
+      ],
+      "exact_match": false,
+      "f1_score": 0.6341463414634148,
+      "similarity_score": 0.4642857142857143,
+      "retrieval_success": true,
+      "grounding_score": 0.7600096821784973,
+      "attribution_score": 0.9177625179290771,
+      "response_time": 23.98356819152832,
+      "metadata": {
+        "rag_result": {
+          "answer": "The importance of data quality in AI systems is high because poor quality data can lead to biased models, inaccurate predictions, and unreliable outcomes, which are crucial factors for machine learning success.",
+          "sources": [
+            {
+              "document_id": 62,
+              "chunk_id": 938,
+              "content": "uality Data quality is crucial for machine learning success. Poor quality data leads to biased models, inaccurate predictions, and unreliable outcomes.",
+              "filename": "machine_learning_basics.md",
+              "similarity": 0.7751547694206238
+            },
+            {
+              "document_id": 58,
+              "chunk_id": 836,
+              "content": "uality Data quality is crucial for machine learning success. Poor quality data leads to biased models, inaccurate predictions, and unreliable outcomes.",
+              "filename": "Unknown",
+              "similarity": 0.7751547694206238
+            },
+            {
+              "document_id": 54,
+              "chunk_id": 734,
+              "content": "uality Data quality is crucial for machine learning success. Poor quality data leads to biased models, inaccurate predictions, and unreliable outcomes.",
+              "filename": "Unknown",
+              "similarity": 0.7751547694206238
+            },
+            {
+              "document_id": 60,
+              "chunk_id": 883,
+              "content": "s: Bias introduced through the selection of training data 2. Privacy and Data Protection AI systems often require large amounts of personal data to function effectively.",
+              "filename": "ai_ethics.md",
+              "similarity": 0.7372920513153076
+            },
+            {
+              "document_id": 56,
+              "chunk_id": 781,
+              "content": "s: Bias introduced through the selection of training data 2. Privacy and Data Protection AI systems often require large amounts of personal data to function effectively.",
+              "filename": "Unknown",
+              "similarity": 0.7372920513153076
+            }
+          ],
+          "similarity_scores": [
+            0.7751547694206238,
+            0.7751547694206238,
+            0.7751547694206238,
+            0.7372920513153076,
+            0.7372920513153076
+          ],
+          "query_time": 23.98275923728943,
+          "retrieval_success": true,
+          "num_sources": 5
+        },
+        "attribution_metadata": {
+          "total_sentences": 1,
+          "hallucinated_sentences": 0,
+          "attribution_counts": {
+            "high": 1,
+            "medium": 0,
+            "low": 0,
+            "none": 0
+          },
+          "average_confidence": 0.9177625179290771,
+          "quality_score": 0.9177625179290771,
+          "problematic_sentences": [],
+          "attribution_summary": {
+            "high_confidence": 1,
+            "medium_confidence": 0,
+            "low_confidence": 0,
+            "no_attribution": 0
+          }
+        }
+      }
+    }
+  ],
+  "aggregate_metrics": {
+    "exact_match_rate": 0.0,
+    "f1_score": 0.45572433915161187,
+    "similarity_score": 0.32772167522650697,
+    "retrieval_success_rate": 0.9333333333333333,
+    "grounding_score": 0.7334006055196126,
+    "attribution_score": 0.7311328702132223,
+    "average_response_time": 26.848833910624187,
+    "total_questions": 15,
+    "successful_retrievals": 14,
+    "exact_matches": 0,
+    "errors": 0,
+    "retrieval_failures": 1,
+    "performance_by_type": {}
+  },
+  "total_questions": 15,
+  "evaluation_timestamp": 1760982679.5680268
+}

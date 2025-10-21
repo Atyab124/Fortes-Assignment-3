@@ -1,173 +1,264 @@
-"""Main entry point for the RAG Q&A application."""
+"""Main application entry point for the RAG Q&A system."""
 
 import argparse
+import logging
 import sys
 from pathlib import Path
 
-from rag_core import RAGCore
-from evaluation import RAGEvaluator
-from observability import ObservabilityManager
-from database import DatabaseManager
+from config import Config
+from rag_core import RAGSystem
+from guardrails import SafetyGuardrails
+from attribution import AttributionAnalyzer
+from observability import RAGMonitor, MetricsCollector
+from evaluation import run_evaluation
 
-def main():
-    """Main function for command-line interface."""
-    parser = argparse.ArgumentParser(description="RAG Q&A Application")
-    parser.add_argument("--mode", choices=["web", "cli", "eval"], default="web", 
-                       help="Application mode")
-    parser.add_argument("--use-local", action="store_true", 
-                       help="Use local model instead of API")
-    parser.add_argument("--corpus-dir", type=str, default="sample_corpus",
-                       help="Directory containing documents to process")
-    parser.add_argument("--eval-file", type=str, default="eval.yaml",
-                       help="Evaluation data file")
-    parser.add_argument("--output", type=str, default="eval_report.json",
-                       help="Output file for evaluation results")
-    
-    args = parser.parse_args()
-    
-    if args.mode == "web":
-        # Launch web interface
-        try:
-            import streamlit.web.cli as stcli
-            import sys
-            sys.argv = ["streamlit", "run", "web_ui.py"]
-            stcli.main()
-        except ImportError:
-            print("Streamlit not installed. Please install with: pip install streamlit")
-            sys.exit(1)
-    
-    elif args.mode == "cli":
-        # Command-line interface
-        run_cli(args)
-    
-    elif args.mode == "eval":
-        # Evaluation mode
-        run_evaluation(args)
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('rag_system.log'),
+        logging.StreamHandler(sys.stdout)
+    ]
+)
 
-def run_cli(args):
-    """Run command-line interface."""
-    print("Initializing RAG system...")
+logger = logging.getLogger(__name__)
+
+def setup_rag_system(config: Config) -> tuple:
+    """Set up the complete RAG system with all components."""
+    logger.info("Initializing RAG system...")
     
-    # Initialize RAG system
-    rag = RAGCore(use_local_model=args.use_local)
+    # Core RAG system
+    rag_system = RAGSystem(config)
     
-    # Initialize database
-    db_manager = DatabaseManager()
-    db_manager.create_tables()
+    # Safety guardrails
+    guardrails = SafetyGuardrails(config)
     
-    # Initialize observability
-    observability = ObservabilityManager()
+    # Attribution analyzer
+    attribution_analyzer = AttributionAnalyzer()
     
-    print("RAG system initialized successfully!")
+    # Monitoring
+    metrics_collector = MetricsCollector()
+    monitor = RAGMonitor(rag_system, metrics_collector)
     
-    # Process corpus if directory exists
-    corpus_path = Path(args.corpus_dir)
-    if corpus_path.exists():
-        print(f"Processing documents from {args.corpus_dir}...")
-        
-        # Get all supported files
-        supported_extensions = ['.md', '.txt', '.pdf', '.docx']
-        file_paths = []
-        for ext in supported_extensions:
-            file_paths.extend(list(corpus_path.glob(f"*{ext}")))
-        
-        if file_paths:
-            results = rag.ingest_documents([str(f) for f in file_paths])
-            print(f"Processed {results['documents_processed']} documents")
-            print(f"Created {results['chunks_created']} chunks")
-            
-            if results['errors']:
-                print(f"Errors: {len(results['errors'])}")
-                for error in results['errors']:
-                    print(f"  - {error}")
+    logger.info("RAG system initialized successfully")
+    return rag_system, guardrails, attribution_analyzer, monitor
+
+def ingest_documents(rag_system: RAGSystem, path: str):
+    """Ingest documents from a file or directory."""
+    path = Path(path)
+    
+    if not path.exists():
+        logger.error(f"Path does not exist: {path}")
+        return
+    
+    if path.is_file():
+        logger.info(f"Ingesting single file: {path}")
+        result = rag_system.ingest_document(str(path))
+        if result['success']:
+            logger.info(f"Successfully ingested {result['filename']}")
         else:
-            print("No supported documents found in corpus directory")
+            logger.error(f"Failed to ingest {result['filename']}: {result.get('error')}")
     
-    # Interactive CLI
-    print("\nInteractive CLI - Type 'quit' to exit")
-    print("Ask questions about your documents:")
+    elif path.is_dir():
+        logger.info(f"Ingesting directory: {path}")
+        result = rag_system.ingest_directory(str(path))
+        logger.info(f"Ingestion complete: {result['successful_files']}/{result['total_files']} files processed")
+        
+        if result['failed_files'] > 0:
+            logger.warning(f"{result['failed_files']} files failed to process")
+    
+    else:
+        logger.error(f"Invalid path: {path}")
+
+def query_system(rag_system: RAGSystem, guardrails: SafetyGuardrails, 
+                attribution_analyzer: AttributionAnalyzer, monitor: RAGMonitor):
+    """Interactive query mode."""
+    logger.info("Starting interactive query mode. Type 'quit' to exit.")
     
     while True:
         try:
-            question = input("\n> ").strip()
+            query = input("\nEnter your question: ").strip()
             
-            if question.lower() in ['quit', 'exit', 'q']:
+            if query.lower() in ['quit', 'exit', 'q']:
                 break
             
-            if not question:
+            if not query:
                 continue
             
-            print("Thinking...")
-            response = rag.query(question)
+            # Validate query through guardrails
+            is_valid, processed_query, validation_metadata = guardrails.validate_query(query)
             
-            print(f"\nAnswer: {response.answer}")
+            if not is_valid:
+                print(f"❌ Query rejected: {processed_query}")
+                continue
             
-            if response.citations:
-                print(f"\nCitations ({len(response.citations)}):")
-                for i, citation in enumerate(response.citations, 1):
-                    print(f"  {i}. {citation.get('filename', 'Unknown')} (score: {citation.get('similarity_score', 0):.3f})")
-                    print(f"     {citation.get('content', '')[:100]}...")
+            # Process query
+            print("🔍 Processing your question...")
+            result = rag_system.query(processed_query)
             
-            print(f"\nMetadata:")
-            print(f"  - Grounding Score: {response.grounding_score:.3f}")
-            print(f"  - Hallucination Detected: {response.hallucination_detected}")
-            print(f"  - Tokens Used: {response.tokens_used}")
-            print(f"  - Estimated Cost: ${response.estimated_cost:.4f}")
-            print(f"  - Processing Time: {response.processing_time:.3f}s")
+            # Monitor the query
+            monitor.monitor_query(processed_query, result)
+            
+            # Display results
+            print("\n" + "="*60)
+            print("ANSWER:")
+            print("="*60)
+            print(result['answer'])
+            
+            if result.get('sources'):
+                print("\n📚 SOURCES:")
+                print("-" * 40)
+                for i, source in enumerate(result['sources'], 1):
+                    print(f"{i}. {source['filename']} (similarity: {source['similarity']:.3f})")
+                    print(f"   {source['content'][:100]}...")
+                    print()
+            
+            # Attribution analysis
+            if result.get('sources') and attribution_analyzer:
+                print("🔍 ATTRIBUTION ANALYSIS:")
+                print("-" * 40)
+                attributions = attribution_analyzer.analyze_response(result['answer'], result['sources'])
+                report = attribution_analyzer.generate_attribution_report(attributions)
+                
+                print(f"Quality Score: {report['quality_score']:.3f}")
+                print(f"Hallucinated Sentences: {report['hallucinated_sentences']}/{report['total_sentences']}")
+                
+                if report['problematic_sentences']:
+                    print("\n⚠️  Problematic Sentences:")
+                    for prob in report['problematic_sentences'][:3]:
+                        print(f"  - {prob['sentence'][:80]}... ({prob['reason']})")
+            
+            print(f"\n⏱️  Response time: {result['query_time']:.2f}s")
             
         except KeyboardInterrupt:
-            print("\nExiting...")
             break
         except Exception as e:
-            print(f"Error: {e}")
+            logger.error(f"Error processing query: {e}")
+            print(f"❌ Error: {e}")
 
-def run_evaluation(args):
+def run_evaluation_mode(rag_system: RAGSystem, config: Config):
     """Run evaluation mode."""
-    print("Running evaluation...")
+    logger.info("Starting evaluation mode...")
     
-    # Initialize RAG system
-    rag = RAGCore(use_local_model=args.use_local)
-    
-    # Initialize database
-    db_manager = DatabaseManager()
-    db_manager.create_tables()
-    
-    # Process corpus if directory exists
-    corpus_path = Path(args.corpus_dir)
-    if corpus_path.exists():
-        print(f"Processing documents from {args.corpus_dir}...")
-        
-        supported_extensions = ['.md', '.txt', '.pdf', '.docx']
-        file_paths = []
-        for ext in supported_extensions:
-            file_paths.extend(list(corpus_path.glob(f"*{ext}")))
-        
-        if file_paths:
-            results = rag.ingest_documents([str(f) for f in file_paths])
-            print(f"Processed {results['documents_processed']} documents")
-            print(f"Created {results['chunks_created']} chunks")
-        else:
-            print("No supported documents found in corpus directory")
-            return
+    # Set up components for evaluation
+    guardrails = SafetyGuardrails(config)
+    attribution_analyzer = AttributionAnalyzer()
     
     # Run evaluation
-    evaluator = RAGEvaluator(rag)
-    eval_data = evaluator.load_eval_data(args.eval_file)
+    try:
+        results = run_evaluation(
+            rag_system=rag_system,
+            eval_config_path=config.EVAL_CONFIG_PATH,
+            output_path=config.EVAL_REPORT_PATH,
+            guardrails=guardrails,
+            attribution_analyzer=attribution_analyzer
+        )
+        
+        logger.info("Evaluation completed successfully")
+        return results
+        
+    except Exception as e:
+        logger.error(f"Evaluation failed: {e}")
+        raise
+
+def show_stats(rag_system: RAGSystem, monitor: RAGMonitor):
+    """Show system statistics."""
+    stats = rag_system.get_document_stats()
+    system_metrics = monitor.get_system_metrics()
     
-    if not eval_data:
-        print("No evaluation data found. Creating sample data...")
-        evaluator._create_sample_eval_data()
-        eval_data = evaluator.eval_data
+    print("\n" + "="*50)
+    print("SYSTEM STATISTICS")
+    print("="*50)
+    print(f"Documents: {stats['total_documents']}")
+    print(f"Chunks: {stats['total_chunks']}")
+    print(f"Embeddings: {stats['total_embeddings']}")
+    print(f"File Types: {stats['file_types']}")
+    print(f"Memory Usage: {system_metrics.memory_usage_mb:.1f} MB")
+    print(f"CPU Usage: {system_metrics.cpu_usage_percent:.1f}%")
+    print("="*50)
+
+def main():
+    """Main application entry point."""
+    parser = argparse.ArgumentParser(description="RAG Q&A System")
+    parser.add_argument("--config", help="Configuration file path")
+    parser.add_argument("--ingest", help="Path to file or directory to ingest")
+    parser.add_argument("--query", help="Single query to process")
+    parser.add_argument("--interactive", action="store_true", help="Start interactive query mode")
+    parser.add_argument("--evaluate", action="store_true", help="Run evaluation")
+    parser.add_argument("--stats", action="store_true", help="Show system statistics")
+    parser.add_argument("--clear", action="store_true", help="Clear all data")
+    parser.add_argument("--rebuild", action="store_true", help="Rebuild vector index")
     
-    print(f"Running evaluation on {len(eval_data)} questions...")
-    results = evaluator.run_evaluation(eval_data)
+    args = parser.parse_args()
     
-    # Print summary
-    evaluator.print_summary()
+    # Load configuration
+    config = Config()
     
-    # Save results
-    output_file = evaluator.save_results(args.output)
-    print(f"Evaluation results saved to {output_file}")
+    try:
+        # Set up RAG system
+        rag_system, guardrails, attribution_analyzer, monitor = setup_rag_system(config)
+
+        # --- Auto-ingest sample corpus if no --ingest argument ---
+        if not args.ingest:
+            sample_corpus_dir = config.get_sample_corpus_dir()
+            if sample_corpus_dir.exists():
+                try:
+                    corpus_files = list(sample_corpus_dir.glob("*"))
+                    if corpus_files:
+                        logger.info(f"Auto-ingesting sample corpus from: {sample_corpus_dir}")
+                        ingest_documents(rag_system, str(sample_corpus_dir))
+                    else:
+                        logger.warning(f"Sample corpus directory is empty: {sample_corpus_dir}")
+                except Exception as e:
+                    logger.error(f"Failed to ingest sample corpus automatically: {e}")
+            else:
+                logger.warning(f"Sample corpus directory not found: {sample_corpus_dir}")
+        
+        # Handle different modes
+        if args.clear:
+            rag_system.clear_all_data()
+            print("✅ All data cleared")
+            return
+        
+        if args.rebuild:
+            rag_system.rebuild_index()
+            print("✅ Vector index rebuilt")
+            return
+        
+        if args.ingest:
+            ingest_documents(rag_system, args.ingest)
+            return
+        
+        if args.query:
+            # Single query mode
+            is_valid, processed_query, _ = guardrails.validate_query(args.query)
+            if is_valid:
+                result = rag_system.query(processed_query)
+                monitor.monitor_query(processed_query, result)
+                print(f"Answer: {result['answer']}")
+            else:
+                print(f"Query rejected: {processed_query}")
+            return
+        
+        if args.evaluate:
+            run_evaluation_mode(rag_system, config)
+            return
+        
+        if args.stats:
+            show_stats(rag_system, monitor)
+            return
+        
+        if args.interactive:
+            query_system(rag_system, guardrails, attribution_analyzer, monitor)
+            return
+        
+        # Default: show help
+        parser.print_help()
+        
+    except Exception as e:
+        logger.error(f"Application error: {e}")
+        sys.exit(1)
 
 if __name__ == "__main__":
     main()

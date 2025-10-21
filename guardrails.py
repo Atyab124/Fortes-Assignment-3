@@ -1,360 +1,410 @@
-"""Security guardrails for prompt injection detection and PII redaction."""
+"""Safety guardrails for the RAG system."""
 
 import re
-from typing import List, Dict, Any, Tuple, Optional
-import tiktoken
+import logging
+from typing import List, Dict, Any, Optional, Tuple
+from enum import Enum
+import hashlib
 
-class Guardrails:
-    """Security guardrails for the RAG application."""
+logger = logging.getLogger(__name__)
+
+class SafetyLevel(Enum):
+    """Safety levels for content filtering."""
+    SAFE = "safe"
+    SUSPICIOUS = "suspicious"
+    UNSAFE = "unsafe"
+
+class PromptInjectionDetector:
+    """Detects prompt injection attempts."""
     
     def __init__(self):
-        # Prompt injection patterns
+        """Initialize prompt injection detector."""
         self.injection_patterns = [
-            r"ignore\s+(previous|above|all)\s+instructions?",
-            r"forget\s+(everything|all|previous)",
-            r"you\s+are\s+(now|a)\s+(different|new)",
-            r"pretend\s+to\s+be",
-            r"act\s+as\s+if",
-            r"roleplay\s+as",
-            r"system\s*:\s*",
-            r"assistant\s*:\s*",
-            r"human\s*:\s*",
-            r"jailbreak",
-            r"bypass",
-            r"override",
-            r"hack",
-            r"exploit",
-            r"vulnerability",
-            r"backdoor",
-            r"admin\s+access",
-            r"root\s+access",
-            r"sudo",
-            r"privilege\s+escalation",
-            r"prompt\s+injection",
-            r"data\s+exfiltration",
-            r"unauthorized\s+access",
-            r"security\s+breach",
-            r"malicious\s+code",
-            r"payload",
-            r"exploit\s+code",
-            r"injection\s+attack",
-            r"social\s+engineering",
-            r"phishing",
-            r"malware",
-            r"virus",
-            r"trojan",
-            r"backdoor",
-            r"keylogger",
-            r"spyware",
-            r"ransomware",
-            r"botnet",
-            r"ddos",
-            r"brute\s+force",
-            r"dictionary\s+attack",
-            r"rainbow\s+table",
-            r"sql\s+injection",
-            r"xss",
-            r"csrf",
-            r"buffer\s+overflow",
-            r"format\s+string",
-            r"integer\s+overflow",
-            r"use\s+after\s+free",
-            r"double\s+free",
-            r"heap\s+spray",
-            r"rop\s+chain",
-            r"jop\s+chain",
-            r"ret2libc",
-            r"ret2syscall",
-            r"aslr\s+bypass",
-            r"dep\s+bypass",
-            r"stack\s+canary\s+bypass",
-            r"pie\s+bypass",
-            r"relro\s+bypass",
-            r"format\s+string\s+bug",
-            r"heap\s+corruption",
-            r"use\s+after\s+free",
-            r"double\s+free",
-            r"integer\s+overflow",
-            r"buffer\s+overflow",
-            r"stack\s+overflow",
-            r"heap\s+overflow",
-            r"format\s+string\s+vulnerability",
-            r"integer\s+underflow",
-            r"type\s+confusion",
-            r"race\s+condition",
-            r"time\s+of\s+check\s+time\s+of\s+use",
-            r"toctou",
-            r"symlink\s+attack",
-            r"directory\s+traversal",
-            r"path\s+traversal",
-            r"file\s+inclusion",
-            r"remote\s+file\s+inclusion",
-            r"local\s+file\s+inclusion",
-            r"lfi",
-            r"rfi",
-            r"command\s+injection",
-            r"code\s+injection",
-            r"ldap\s+injection",
-            r"xpath\s+injection",
-            r"no\s+sql\s+injection",
-            r"nosql\s+injection",
-            r"mongo\s+injection",
-            r"couch\s+injection",
-            r"cassandra\s+injection",
-            r"redis\s+injection",
-            r"memcached\s+injection",
-            r"elasticsearch\s+injection",
-            r"solr\s+injection",
-            r"lucene\s+injection",
-            r"hibernate\s+injection",
-            r"jpa\s+injection",
-            r"jdbc\s+injection",
-            r"odbc\s+injection",
-            r"ole\s+injection",
-            r"com\s+injection",
-            r"dcom\s+injection",
-            r"corba\s+injection",
-            r"soap\s+injection",
-            r"rest\s+injection",
-            r"graphql\s+injection",
-            r"json\s+injection",
-            r"xml\s+injection",
-            r"yaml\s+injection",
-            r"toml\s+injection",
-            r"ini\s+injection",
-            r"conf\s+injection",
-            r"cfg\s+injection",
-            r"properties\s+injection",
-            r"env\s+injection",
-            r"environment\s+injection",
-            r"config\s+injection",
-            r"setting\s+injection",
-            r"parameter\s+injection",
-            r"argument\s+injection",
-            r"option\s+injection",
-            r"flag\s+injection",
-            r"switch\s+injection",
-            r"variable\s+injection",
-            r"value\s+injection",
-            r"data\s+injection",
-            r"input\s+injection",
-            r"user\s+input\s+injection",
-            r"form\s+injection",
-            r"field\s+injection",
-            r"attribute\s+injection",
-            r"property\s+injection",
-            r"element\s+injection",
-            r"tag\s+injection",
-            r"node\s+injection",
-            r"object\s+injection",
-            r"class\s+injection",
-            r"method\s+injection",
-            r"function\s+injection",
-            r"procedure\s+injection",
-            r"routine\s+injection",
-            r"script\s+injection",
-            r"code\s+injection",
-            r"executable\s+injection",
-            r"binary\s+injection",
-            r"assembly\s+injection",
-            r"machine\s+code\s+injection",
-            r"bytecode\s+injection",
-            r"opcode\s+injection",
-            r"instruction\s+injection",
-            r"command\s+injection",
-            r"shell\s+injection",
-            r"bash\s+injection",
-            r"powershell\s+injection",
-            r"cmd\s+injection",
-            r"batch\s+injection",
-            r"vbs\s+injection",
-            r"vbscript\s+injection",
-            r"jscript\s+injection",
-            r"javascript\s+injection",
-            r"python\s+injection",
-            r"perl\s+injection",
-            r"ruby\s+injection",
-            r"php\s+injection",
-            r"asp\s+injection",
-            r"jsp\s+injection",
-            r"servlet\s+injection",
-            r"ejb\s+injection",
-            r"bean\s+injection",
-            r"component\s+injection",
-            r"service\s+injection",
-            r"api\s+injection",
-            r"endpoint\s+injection",
-            r"url\s+injection",
-            r"uri\s+injection",
-            r"path\s+injection",
-            r"route\s+injection",
-            r"handler\s+injection",
-            r"controller\s+injection",
-            r"action\s+injection",
-            r"method\s+injection",
-            r"function\s+injection",
-            r"procedure\s+injection",
-            r"routine\s+injection",
-            r"script\s+injection",
-            r"code\s+injection",
-            r"executable\s+injection",
-            r"binary\s+injection",
-            r"assembly\s+injection",
-            r"machine\s+code\s+injection",
-            r"bytecode\s+injection",
-            r"opcode\s+injection",
-            r"instruction\s+injection",
-            r"command\s+injection",
-            r"shell\s+injection",
-            r"bash\s+injection",
-            r"powershell\s+injection",
-            r"cmd\s+injection",
-            r"batch\s+injection",
-            r"vbs\s+injection",
-            r"vbscript\s+injection",
-            r"jscript\s+injection",
-            r"javascript\s+injection",
-            r"python\s+injection",
-            r"perl\s+injection",
-            r"ruby\s+injection",
-            r"php\s+injection",
-            r"asp\s+injection",
-            r"jsp\s+injection",
-            r"servlet\s+injection",
-            r"ejb\s+injection",
-            r"bean\s+injection",
-            r"component\s+injection",
-            r"service\s+injection",
-            r"api\s+injection",
-            r"endpoint\s+injection",
-            r"url\s+injection",
-            r"uri\s+injection",
-            r"path\s+injection",
-            r"route\s+injection",
-            r"handler\s+injection",
-            r"controller\s+injection",
-            r"action\s+injection"
+            # Common injection patterns
+            r'ignore\s+(?:previous|above|all)\s+(?:instructions?|prompts?)',
+            r'forget\s+(?:everything|all|previous)',
+            r'you\s+are\s+now\s+(?:a\s+)?(?:different|new)',
+            r'act\s+as\s+if\s+you\s+are',
+            r'pretend\s+to\s+be',
+            r'roleplay\s+as',
+            r'system\s*:\s*',
+            r'assistant\s*:\s*',
+            r'human\s*:\s*',
+            r'user\s*:\s*',
+            r'<\|.*?\|>',  # Special tokens
+            r'\[INST\].*?\[/INST\]',  # Llama format
+            r'<s>.*?</s>',  # BOS/EOS tokens
+            r'###\s*(?:system|assistant|user)\s*:',
+            r'---\s*(?:system|assistant|user)\s*:',
+            r'```.*?```',  # Code blocks in prompts
+            r'jailbreak',
+            r'prompt\s+injection',
+            r'override\s+instructions?',
+            r'new\s+instructions?:\s*',
+            r'ignore\s+the\s+above',
+            r'disregard\s+previous',
+            r'new\s+task:\s*',
+            r'actually\s*,?\s*',
+            r'nevermind\s*,?\s*',
+            r'wait\s*,?\s*',
+            r'hold\s+on\s*,?\s*',
+            r'stop\s*,?\s*',
+            r'cancel\s+that\s*,?\s*',
+            r'disregard\s+everything',
+            r'start\s+over',
+            r'begin\s+again',
+            r'reset\s+yourself',
+            r'clear\s+your\s+memory',
+            r'delete\s+everything',
+            r'wipe\s+your\s+memory',
         ]
         
-        # PII patterns
-        self.pii_patterns = {
-            "email": r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b',
-            "phone": r'\b(?:\+?1[-.\s]?)?\(?([0-9]{3})\)?[-.\s]?([0-9]{3})[-.\s]?([0-9]{4})\b',
-            "ssn": r'\b\d{3}-\d{2}-\d{4}\b',
-            "credit_card": r'\b\d{4}[-\s]?\d{4}[-\s]?\d{4}[-\s]?\d{4}\b',
-            "ip_address": r'\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b',
-            "url": r'https?://[^\s<>"{}|\\^`\[\]]+',
-            "date_of_birth": r'\b\d{1,2}[/-]\d{1,2}[/-]\d{2,4}\b'
-        }
-        
-        # Compile patterns for efficiency
-        self.injection_regex = [re.compile(pattern, re.IGNORECASE) for pattern in self.injection_patterns]
-        self.pii_regex = {name: re.compile(pattern, re.IGNORECASE) for name, pattern in self.pii_patterns.items()}
+        self.compiled_patterns = [re.compile(pattern, re.IGNORECASE | re.DOTALL) 
+                                for pattern in self.injection_patterns]
     
-    def detect_prompt_injection(self, text: str) -> Tuple[bool, List[str]]:
-        """Detect potential prompt injection attempts."""
+    def detect(self, text: str) -> Tuple[SafetyLevel, List[str], Dict[str, Any]]:
+        """Detect prompt injection attempts."""
+        text_lower = text.lower()
         detected_patterns = []
+        risk_score = 0.0
         
-        for regex in self.injection_regex:
-            if regex.search(text):
-                detected_patterns.append(regex.pattern)
-        
-        return len(detected_patterns) > 0, detected_patterns
-    
-    def redact_pii(self, text: str) -> Tuple[str, Dict[str, int]]:
-        """Redact PII from text."""
-        redacted_text = text
-        pii_counts = {}
-        
-        for pii_type, regex in self.pii_regex.items():
-            matches = regex.findall(text)
+        for i, pattern in enumerate(self.compiled_patterns):
+            matches = pattern.findall(text)
             if matches:
-                pii_counts[pii_type] = len(matches)
-                if pii_type == "email":
-                    redacted_text = regex.sub("[EMAIL_REDACTED]", redacted_text)
-                elif pii_type == "phone":
-                    redacted_text = regex.sub("[PHONE_REDACTED]", redacted_text)
-                elif pii_type == "ssn":
-                    redacted_text = regex.sub("[SSN_REDACTED]", redacted_text)
-                elif pii_type == "credit_card":
-                    redacted_text = regex.sub("[CARD_REDACTED]", redacted_text)
-                elif pii_type == "ip_address":
-                    redacted_text = regex.sub("[IP_REDACTED]", redacted_text)
-                elif pii_type == "url":
-                    redacted_text = regex.sub("[URL_REDACTED]", redacted_text)
-                elif pii_type == "date_of_birth":
-                    redacted_text = regex.sub("[DOB_REDACTED]", redacted_text)
+                detected_patterns.extend(matches)
+                # Weight different patterns differently
+                if i < 10:  # High-risk patterns
+                    risk_score += 0.3
+                elif i < 20:  # Medium-risk patterns
+                    risk_score += 0.2
+                else:  # Low-risk patterns
+                    risk_score += 0.1
         
-        return redacted_text, pii_counts
-    
-    def validate_query(self, query: str) -> Dict[str, Any]:
-        """Validate a query for security issues."""
-        # Check for prompt injection
-        injection_detected, injection_patterns = self.detect_prompt_injection(query)
+        # Additional heuristics
+        if len(text) > 500 and '?' not in text and '!' not in text:
+            risk_score += 0.1  # Suspiciously long without questions
         
-        # Check for PII
-        pii_redacted, pii_counts = self.redact_pii(query)
+        if text.count('"') > 10 or text.count("'") > 10:
+            risk_score += 0.1  # Excessive quotes
         
-        # Check query length
-        is_too_long = len(query) > 1000
+        if any(word in text_lower for word in ['hack', 'exploit', 'bypass', 'trick']):
+            risk_score += 0.2
         
-        # Check for empty query
-        is_empty = not query.strip()
-        
-        # Determine if query should be blocked
-        should_block = (
-            injection_detected or 
-            is_too_long or 
-            is_empty or
-            any(count > 0 for count in pii_counts.values())
-        )
-        
-        return {
-            "is_safe": not should_block,
-            "injection_detected": injection_detected,
-            "injection_patterns": injection_patterns,
-            "pii_detected": any(count > 0 for count in pii_counts.values()),
-            "pii_counts": pii_counts,
-            "pii_redacted": pii_redacted,
-            "is_too_long": is_too_long,
-            "is_empty": is_empty,
-            "should_block": should_block,
-            "block_reason": self._get_block_reason(injection_detected, pii_counts, is_too_long, is_empty)
-        }
-    
-    def _get_block_reason(self, injection_detected: bool, pii_counts: Dict[str, int], 
-                         is_too_long: bool, is_empty: bool) -> str:
-        """Get reason for blocking query."""
-        if is_empty:
-            return "Query is empty"
-        elif is_too_long:
-            return "Query is too long (max 1000 characters)"
-        elif injection_detected:
-            return "Potential prompt injection detected"
-        elif any(count > 0 for count in pii_counts.values()):
-            return "PII detected in query"
+        # Determine safety level
+        if risk_score >= 0.7:
+            safety_level = SafetyLevel.UNSAFE
+        elif risk_score >= 0.3:
+            safety_level = SafetyLevel.SUSPICIOUS
         else:
-            return "Query is safe"
-    
-    def sanitize_response(self, response: str) -> Tuple[str, Dict[str, int]]:
-        """Sanitize response for PII."""
-        return self.redact_pii(response)
-    
-    def get_security_report(self, query: str, response: str = None) -> Dict[str, Any]:
-        """Get comprehensive security report."""
-        query_validation = self.validate_query(query)
+            safety_level = SafetyLevel.SAFE
         
-        report = {
-            "query_validation": query_validation,
-            "response_sanitization": None
+        metadata = {
+            'risk_score': risk_score,
+            'pattern_count': len(detected_patterns),
+            'text_length': len(text),
+            'detected_patterns': detected_patterns[:5]  # Limit for logging
         }
         
-        if response:
-            sanitized_response, pii_counts = self.sanitize_response(response)
-            report["response_sanitization"] = {
-                "pii_detected": any(count > 0 for count in pii_counts.values()),
-                "pii_counts": pii_counts,
-                "sanitized_response": sanitized_response
+        return safety_level, detected_patterns, metadata
+
+class PIIRedactor:
+    """Redacts personally identifiable information."""
+    
+    def __init__(self):
+        """Initialize PII redactor."""
+        self.pii_patterns = {
+            'email': re.compile(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'),
+            'phone': re.compile(r'\b(?:\+?1[-.\s]?)?\(?([0-9]{3})\)?[-.\s]?([0-9]{3})[-.\s]?([0-9]{4})\b'),
+            'ssn': re.compile(r'\b\d{3}-\d{2}-\d{4}\b'),
+            'credit_card': re.compile(r'\b\d{4}[\s-]?\d{4}[\s-]?\d{4}[\s-]?\d{4}\b'),
+            'ip_address': re.compile(r'\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b'),
+            'url': re.compile(r'https?://[^\s<>"{}|\\^`\[\]]+'),
+            'mac_address': re.compile(r'\b(?:[0-9A-Fa-f]{2}[:-]){5}(?:[0-9A-Fa-f]{2})\b'),
+            'date_of_birth': re.compile(r'\b(?:0?[1-9]|1[0-2])[-/](?:0?[1-9]|[12][0-9]|3[01])[-/](?:19|20)\d{2}\b'),
+        }
+        
+        self.redaction_map = {
+            'email': '[EMAIL_REDACTED]',
+            'phone': '[PHONE_REDACTED]',
+            'ssn': '[SSN_REDACTED]',
+            'credit_card': '[CARD_REDACTED]',
+            'ip_address': '[IP_REDACTED]',
+            'url': '[URL_REDACTED]',
+            'mac_address': '[MAC_REDACTED]',
+            'date_of_birth': '[DOB_REDACTED]'
+        }
+    
+    def redact(self, text: str, pii_types: Optional[List[str]] = None) -> Tuple[str, Dict[str, Any]]:
+        """Redact PII from text."""
+        if pii_types is None:
+            pii_types = list(self.pii_patterns.keys())
+        
+        redacted_text = text
+        redacted_items = {}
+        
+        for pii_type in pii_types:
+            if pii_type in self.pii_patterns:
+                pattern = self.pii_patterns[pii_type]
+                matches = pattern.findall(text)
+                
+                if matches:
+                    redacted_items[pii_type] = len(matches)
+                    redacted_text = pattern.sub(self.redaction_map[pii_type], redacted_text)
+        
+        metadata = {
+            'original_length': len(text),
+            'redacted_length': len(redacted_text),
+            'redacted_items': redacted_items,
+            'total_redacted': sum(redacted_items.values())
+        }
+        
+        return redacted_text, metadata
+    
+    def detect_only(self, text: str) -> Dict[str, List[str]]:
+        """Detect PII without redacting."""
+        detected_pii = {}
+        
+        for pii_type, pattern in self.pii_patterns.items():
+            matches = pattern.findall(text)
+            if matches:
+                detected_pii[pii_type] = matches
+        
+        return detected_pii
+
+class GroundingValidator:
+    """Validates that answers are grounded in retrieved content."""
+    
+    def __init__(self, similarity_threshold: float = 0.7):
+        """Initialize grounding validator."""
+        self.similarity_threshold = similarity_threshold
+    
+    def validate(self, answer: str, retrieved_chunks: List[Dict[str, Any]], 
+                question: str) -> Tuple[bool, Dict[str, Any]]:
+        """Validate if answer is grounded in retrieved content."""
+        if not retrieved_chunks:
+            return False, {'reason': 'no_retrieved_content', 'confidence': 0.0}
+        
+        # Check if we have high-quality retrieved content
+        high_quality_chunks = [
+            chunk for chunk in retrieved_chunks 
+            if chunk.get('similarity', 0) >= self.similarity_threshold
+        ]
+        
+        if not high_quality_chunks:
+            return False, {
+                'reason': 'low_similarity_scores',
+                'max_similarity': max(chunk.get('similarity', 0) for chunk in retrieved_chunks),
+                'confidence': 0.0
             }
         
-        return report
+        # Check answer length (very short answers might be suspicious)
+        if len(answer.strip()) < 10:
+            return False, {
+                'reason': 'answer_too_short',
+                'answer_length': len(answer.strip()),
+                'confidence': 0.3
+            }
+        
+        # Check if answer contains "I don't know" or similar phrases
+        uncertainty_phrases = [
+            "i don't know", "i'm not sure", "i can't", "i cannot",
+            "no information", "not available", "unclear", "uncertain"
+        ]
+        
+        answer_lower = answer.lower()
+        uncertainty_count = sum(1 for phrase in uncertainty_phrases if phrase in answer_lower)
+        
+        if uncertainty_count > 2:
+            return False, {
+                'reason': 'high_uncertainty',
+                'uncertainty_count': uncertainty_count,
+                'confidence': 0.4
+            }
+        
+        # Calculate grounding confidence
+        max_similarity = max(chunk.get('similarity', 0) for chunk in high_quality_chunks)
+        avg_similarity = sum(chunk.get('similarity', 0) for chunk in high_quality_chunks) / len(high_quality_chunks)
+        
+        confidence = min(1.0, (max_similarity + avg_similarity) / 2)
+        
+        is_grounded = confidence >= 0.5 and len(high_quality_chunks) >= 1
+        
+        return is_grounded, {
+            'reason': 'grounded' if is_grounded else 'low_confidence',
+            'confidence': confidence,
+            'max_similarity': max_similarity,
+            'avg_similarity': avg_similarity,
+            'high_quality_chunks': len(high_quality_chunks),
+            'total_chunks': len(retrieved_chunks)
+        }
+
+class ContentFilter:
+    """Filters inappropriate or harmful content."""
+    
+    def __init__(self):
+        """Initialize content filter."""
+        self.harmful_patterns = [
+            r'violence|violent|harm|hurt|kill|murder|assault',
+            r'hate|racist|sexist|discriminat',
+            r'terrorist|terrorism|bomb|explosive',
+            r'drug|illegal|contraband',
+            r'sexual|explicit|pornographic',
+            r'suicide|self-harm|depression',
+            r'fraud|scam|phishing|malware'
+        ]
+        
+        self.compiled_patterns = [re.compile(pattern, re.IGNORECASE) 
+                                for pattern in self.harmful_patterns]
+    
+    def filter(self, text: str) -> Tuple[bool, List[str], Dict[str, Any]]:
+        """Filter harmful content."""
+        text_lower = text.lower()
+        detected_patterns = []
+        risk_score = 0.0
+        
+        for pattern in self.compiled_patterns:
+            matches = pattern.findall(text)
+            if matches:
+                detected_patterns.extend(matches)
+                risk_score += 0.2
+        
+        is_safe = risk_score < 0.3
+        
+        metadata = {
+            'risk_score': risk_score,
+            'detected_patterns': detected_patterns,
+            'text_length': len(text)
+        }
+        
+        return is_safe, detected_patterns, metadata
+
+class SafetyGuardrails:
+    """Main guardrails system."""
+    
+    def __init__(self, config=None):
+        """Initialize safety guardrails."""
+        self.config = config
+        self.injection_detector = PromptInjectionDetector()
+        self.pii_redactor = PIIRedactor()
+        self.grounding_validator = GroundingValidator()
+        self.content_filter = ContentFilter()
+        
+        # Cache for processed queries
+        self.query_cache = {}
+        self.cache_max_size = 1000
+    
+    def validate_query(self, query: str) -> Tuple[bool, str, Dict[str, Any]]:
+        """Validate user query before processing."""
+        # Check cache first
+        query_hash = hashlib.md5(query.encode()).hexdigest()
+        if query_hash in self.query_cache:
+            return self.query_cache[query_hash]
+        
+        # Clean query
+        cleaned_query = query.strip()
+        if not cleaned_query:
+            result = (False, "Empty query", {'reason': 'empty_query'})
+            self._cache_result(query_hash, result)
+            return result
+        
+        # Check for prompt injection
+        safety_level, patterns, injection_metadata = self.injection_detector.detect(cleaned_query)
+        
+        if safety_level == SafetyLevel.UNSAFE:
+            result = (False, "Query contains potentially harmful prompt injection attempts", {
+                'reason': 'prompt_injection',
+                'safety_level': safety_level.value,
+                'metadata': injection_metadata
+            })
+            self._cache_result(query_hash, result)
+            return result
+        
+        # Check for harmful content
+        is_safe, harmful_patterns, filter_metadata = self.content_filter.filter(cleaned_query)
+        
+        if not is_safe:
+            result = (False, "Query contains inappropriate content", {
+                'reason': 'harmful_content',
+                'metadata': filter_metadata
+            })
+            self._cache_result(query_hash, result)
+            return result
+        
+        # Redact PII from query
+        redacted_query, pii_metadata = self.pii_redactor.redact(cleaned_query)
+        
+        # Cache result
+        result = (True, redacted_query, {
+            'original_query': cleaned_query,
+            'redacted_query': redacted_query,
+            'pii_metadata': pii_metadata,
+            'injection_metadata': injection_metadata,
+            'filter_metadata': filter_metadata
+        })
+        self._cache_result(query_hash, result)
+        
+        return result
+    
+    def validate_response(self, response: str, retrieved_chunks: List[Dict[str, Any]], 
+                         original_query: str) -> Tuple[bool, str, Dict[str, Any]]:
+        """Validate generated response."""
+        # Check for prompt injection in response
+        safety_level, patterns, injection_metadata = self.injection_detector.detect(response)
+        
+        if safety_level == SafetyLevel.UNSAFE:
+            return False, "Response contains potentially harmful content", {
+                'reason': 'harmful_response',
+                'safety_level': safety_level.value,
+                'metadata': injection_metadata
+            }
+        
+        # Check for harmful content
+        is_safe, harmful_patterns, filter_metadata = self.content_filter.filter(response)
+        
+        if not is_safe:
+            return False, "Response contains inappropriate content", {
+                'reason': 'inappropriate_response',
+                'metadata': filter_metadata
+            }
+        
+        # Validate grounding
+        is_grounded, grounding_metadata = self.grounding_validator.validate(
+            response, retrieved_chunks, original_query
+        )
+        
+        if not is_grounded:
+            return False, "Response is not properly grounded in retrieved content", {
+                'reason': 'poor_grounding',
+                'metadata': grounding_metadata
+            }
+        
+        # Redact PII from response
+        redacted_response, pii_metadata = self.pii_redactor.redact(response)
+        
+        return True, redacted_response, {
+            'original_response': response,
+            'redacted_response': redacted_response,
+            'pii_metadata': pii_metadata,
+            'grounding_metadata': grounding_metadata,
+            'injection_metadata': injection_metadata,
+            'filter_metadata': filter_metadata
+        }
+    
+    def _cache_result(self, query_hash: str, result: Tuple[bool, str, Dict[str, Any]]):
+        """Cache validation result."""
+        if len(self.query_cache) >= self.cache_max_size:
+            # Remove oldest entries (simple FIFO)
+            oldest_key = next(iter(self.query_cache))
+            del self.query_cache[oldest_key]
+        
+        self.query_cache[query_hash] = result
+    
+    def get_stats(self) -> Dict[str, Any]:
+        """Get guardrails statistics."""
+        return {
+            'cache_size': len(self.query_cache),
+            'cache_max_size': self.cache_max_size,
+            'pii_patterns': len(self.pii_redactor.pii_patterns),
+            'injection_patterns': len(self.injection_detector.injection_patterns),
+            'harmful_patterns': len(self.content_filter.harmful_patterns)
+        }

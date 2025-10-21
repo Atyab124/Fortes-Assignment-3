@@ -3,60 +3,54 @@
 import os
 import re
 from pathlib import Path
-from typing import List, Dict, Any, Tuple
-import PyPDF2
+from typing import List, Dict, Any, Optional
+import logging
 import docx
 import markdown
 from bs4 import BeautifulSoup
+import pytesseract
+from pdf2image import convert_from_path
+import logging
+import ollama
 
-from config import Config
+logger = logging.getLogger(__name__)
 
 class DocumentProcessor:
-    """Handles document ingestion and chunking."""
+    """Handles document parsing and chunking."""
     
-    def __init__(self, chunk_size: int = None, chunk_overlap: int = None):
-        self.chunk_size = chunk_size or Config.CHUNK_SIZE
-        self.chunk_overlap = chunk_overlap or Config.CHUNK_OVERLAP
+    def __init__(self, chunk_size: int = 1000, chunk_overlap: int = 200):
+        """Initialize document processor."""
+        self.chunk_size = chunk_size
+        self.chunk_overlap = chunk_overlap
     
-    def process_file(self, file_path: str) -> Dict[str, Any]:
-        """Process a single file and return content with metadata."""
+    def extract_text(self, file_path: str) -> str:
+        """Extract text from various file formats."""
         file_path = Path(file_path)
+        file_extension = file_path.suffix.lower()
         
-        if not file_path.exists():
-            raise FileNotFoundError(f"File not found: {file_path}")
-        
-        file_type = file_path.suffix.lower()
-        
-        if file_type == '.txt':
-            content = self._process_txt(file_path)
-        elif file_type == '.md':
-            content = self._process_markdown(file_path)
-        elif file_type == '.pdf':
-            content = self._process_pdf(file_path)
-        elif file_type == '.docx':
-            content = self._process_docx(file_path)
-        else:
-            raise ValueError(f"Unsupported file type: {file_type}")
-        
-        return {
-            "filename": file_path.name,
-            "file_path": str(file_path),
-            "file_type": file_type,
-            "content": content,
-            "metadata": {
-                "file_size": file_path.stat().st_size,
-                "processed_at": str(Path(file_path).stat().st_mtime)
-            }
-        }
+        try:
+            if file_extension == '.txt':
+                return self._extract_txt(file_path)
+            elif file_extension == '.md':
+                return self._extract_markdown(file_path)
+            elif file_extension == '.pdf':
+                return self._extract_pdf(file_path)
+            elif file_extension == '.docx':
+                return self._extract_docx(file_path)
+            else:
+                raise ValueError(f"Unsupported file format: {file_extension}")
+        except Exception as e:
+            logger.error(f"Error extracting text from {file_path}: {e}")
+            raise
     
-    def _process_txt(self, file_path: Path) -> str:
-        """Process a text file."""
-        with open(file_path, 'r', encoding='utf-8') as f:
+    def _extract_txt(self, file_path: Path) -> str:
+        """Extract text from .txt files."""
+        with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
             return f.read()
     
-    def _process_markdown(self, file_path: Path) -> str:
-        """Process a markdown file."""
-        with open(file_path, 'r', encoding='utf-8') as f:
+    def _extract_markdown(self, file_path: Path) -> str:
+        """Extract text from .md files."""
+        with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
             content = f.read()
         
         # Convert markdown to HTML then extract text
@@ -64,28 +58,82 @@ class DocumentProcessor:
         soup = BeautifulSoup(html, 'html.parser')
         return soup.get_text()
     
-    def _process_pdf(self, file_path: Path) -> str:
-        """Process a PDF file."""
-        content = ""
-        with open(file_path, 'rb') as f:
-            pdf_reader = PyPDF2.PdfReader(f)
-            for page in pdf_reader.pages:
-                content += page.extract_text() + "\n"
-        return content
-    
-    def _process_docx(self, file_path: Path) -> str:
-        """Process a Word document."""
+    def _extract_pdf(self, file_path: Path) -> str:
+        """Extract text from .pdf files using OCR only, then refine with Qwen2.5."""
+        import pytesseract
+        from pdf2image import convert_from_path
+        import logging
+        import ollama  # Qwen2.5 through local Ollama server
+
+        logger = logging.getLogger(__name__)
+        text_parts = []
+
+        try:
+            logger.info(f"OCR extraction started for {file_path.name}")
+            images = convert_from_path(file_path, dpi=200)
+            logger.info(f"Converted {len(images)} pages to images for OCR: {file_path.name}")
+
+            for i, image in enumerate(images):
+                page_text = pytesseract.image_to_string(image)
+                text_parts.append(page_text)
+                logger.debug(f"OCR processed page {i + 1}/{len(images)} of {file_path.name}")
+                try:
+                    image.close()
+                except Exception:
+                    pass
+
+            raw_text = "\n".join(text_parts).strip()
+            logger.info(f"OCR complete for {file_path.name}, length={len(raw_text)} chars")
+
+            # --- Qwen2.5 Refinement Step ---
+            if len(raw_text) > 50:
+                logger.info(f"Refining OCR output for {file_path.name} using Qwen2.5...")
+                try:
+                    response = ollama.chat(
+                        model="qwen2.5:latest",
+                        messages=[
+                            {
+                                "role": "system",
+                                "content": (
+                                    "You are a text cleanup assistant. "
+                                    "Your job is to refine OCR text by fixing spelling errors, "
+                                    "restoring punctuation, joining broken lines, and keeping the original meaning."
+                                ),
+                            },
+                            {"role": "user", "content": raw_text[:12000]},  # safety cutoff
+                        ],
+                    )
+                    refined_text = response["message"]["content"].strip()
+                    if len(refined_text) > 0:
+                        logger.info(f"Refinement successful for {file_path.name}")
+                        return refined_text
+                    else:
+                        logger.warning(f"Refinement produced empty result, using raw OCR text.")
+                        return raw_text
+                except Exception as e:
+                    logger.error(f"Refinement via Qwen2.5 failed: {e}")
+                    return raw_text
+            else:
+                logger.warning(f"OCR output too short to refine for {file_path.name}")
+                return raw_text
+
+        except Exception as e:
+            logger.exception(f"OCR extraction failed for {file_path}: {e}")
+            raise
+
+
+    def _extract_docx(self, file_path: Path) -> str:
+        """Extract text from .docx files."""
         doc = docx.Document(file_path)
-        content = ""
+        text = ""
         for paragraph in doc.paragraphs:
-            content += paragraph.text + "\n"
-        return content
+            text += paragraph.text + "\n"
+        return text
     
-    def chunk_text(self, text: str, chunk_size: int = None, 
-                  chunk_overlap: int = None) -> List[Dict[str, Any]]:
+    def chunk_text(self, text: str, metadata: Optional[Dict] = None) -> List[Dict[str, Any]]:
         """Split text into overlapping chunks."""
-        chunk_size = chunk_size or self.chunk_size
-        chunk_overlap = chunk_overlap or self.chunk_overlap
+        if not text.strip():
+            return []
         
         # Clean and normalize text
         text = self._clean_text(text)
@@ -95,72 +143,195 @@ class DocumentProcessor:
         
         chunks = []
         current_chunk = ""
-        current_start = 0
+        current_length = 0
         chunk_index = 0
         
         for i, sentence in enumerate(sentences):
-            # Check if adding this sentence would exceed chunk size
-            if len(current_chunk) + len(sentence) > chunk_size and current_chunk:
+            sentence_length = len(sentence)
+            
+            # If adding this sentence would exceed chunk size
+            if current_length + sentence_length > self.chunk_size and current_chunk:
                 # Save current chunk
-                chunks.append({
-                    "chunk_index": chunk_index,
-                    "content": current_chunk.strip(),
-                    "start_char": current_start,
-                    "end_char": current_start + len(current_chunk)
-                })
+                chunks.append(self._create_chunk(
+                    current_chunk.strip(), 
+                    chunk_index, 
+                    metadata,
+                    start_line=chunks[-1]['end_line'] + 1 if chunks else 1,
+                    end_line=i
+                ))
+                chunk_index += 1
                 
                 # Start new chunk with overlap
-                overlap_text = self._get_overlap_text(current_chunk, chunk_overlap)
+                overlap_text = self._get_overlap_text(current_chunk)
                 current_chunk = overlap_text + sentence
-                current_start = current_start + len(current_chunk) - len(overlap_text) - len(sentence)
-                chunk_index += 1
+                current_length = len(current_chunk)
             else:
                 current_chunk += sentence
+                current_length += sentence_length
         
         # Add final chunk if not empty
         if current_chunk.strip():
-            chunks.append({
-                "chunk_index": chunk_index,
-                "content": current_chunk.strip(),
-                "start_char": current_start,
-                "end_char": current_start + len(current_chunk)
-            })
+            chunks.append(self._create_chunk(
+                current_chunk.strip(),
+                chunk_index,
+                metadata,
+                start_line=chunks[-1]['end_line'] + 1 if chunks else 1,
+                end_line=len(sentences)
+            ))
         
+        logger.info(f"Created {len(chunks)} chunks from text of length {len(text)}")
         return chunks
     
     def _clean_text(self, text: str) -> str:
         """Clean and normalize text."""
-        # Remove extra whitespace
+        # Remove excessive whitespace
         text = re.sub(r'\s+', ' ', text)
         # Remove special characters but keep punctuation
-        text = re.sub(r'[^\w\s.,!?;:()\-]', '', text)
+        text = re.sub(r'[^\w\s\.\,\!\?\;\:\-\(\)\[\]\"\'\/]', ' ', text)
         return text.strip()
     
     def _split_into_sentences(self, text: str) -> List[str]:
         """Split text into sentences."""
-        # Simple sentence splitting - can be improved with NLTK
-        sentences = re.split(r'[.!?]+', text)
-        return [s.strip() + '.' for s in sentences if s.strip()]
+        # Simple sentence splitting (can be improved with nltk or spacy)
+        sentences = re.split(r'(?<=[.!?])\s+', text)
+        return [s.strip() for s in sentences if s.strip()]
     
-    def _get_overlap_text(self, text: str, overlap_size: int) -> str:
-        """Get overlap text from the end of current chunk."""
-        if len(text) <= overlap_size:
-            return text
-        return text[-overlap_size:]
+    def _get_overlap_text(self, chunk: str) -> str:
+        """Get overlap text from the end of a chunk."""
+        if len(chunk) <= self.chunk_overlap:
+            return chunk
+        
+        # Find a good break point near the end
+        overlap_start = len(chunk) - self.chunk_overlap
+        overlap_text = chunk[overlap_start:]
+        
+        # Try to break at sentence boundary
+        sentences = self._split_into_sentences(overlap_text)
+        if len(sentences) > 1:
+            # Take all but the last sentence
+            overlap_text = ' '.join(sentences[:-1])
+        
+        return overlap_text + " "
     
-    def process_directory(self, directory_path: str) -> List[Dict[str, Any]]:
-        """Process all supported files in a directory."""
-        directory = Path(directory_path)
-        if not directory.exists():
-            raise FileNotFoundError(f"Directory not found: {directory_path}")
+    def _create_chunk(self, content: str, index: int, metadata: Optional[Dict], 
+                     start_line: int, end_line: int) -> Dict[str, Any]:
+        """Create a chunk dictionary."""
+        chunk_metadata = metadata.copy() if metadata else {}
+        chunk_metadata.update({
+            'chunk_size': len(content),
+            'word_count': len(content.split()),
+            'character_count': len(content)
+        })
         
-        processed_files = []
-        for file_path in directory.rglob("*"):
-            if file_path.is_file() and file_path.suffix.lower() in Config.SUPPORTED_EXTENSIONS:
-                try:
-                    file_data = self.process_file(str(file_path))
-                    processed_files.append(file_data)
-                except Exception as e:
-                    print(f"Error processing {file_path}: {e}")
+        return {
+            'index': index,
+            'content': content,
+            'start_line': start_line,
+            'end_line': end_line,
+            'metadata': chunk_metadata
+        }
+    
+    def process_file(self, file_path: str) -> Dict[str, Any]:
+        """Process a file and return chunks with metadata."""
+        file_path = Path(file_path)
         
-        return processed_files
+        # Extract text
+        text = self.extract_text(file_path)
+        
+        # Get file metadata
+        file_stats = file_path.stat()
+        metadata = {
+            'filename': file_path.name,
+            'file_path': str(file_path),
+            'file_size': file_stats.st_size,
+            'file_type': file_path.suffix,
+            'word_count': len(text.split()),
+            'character_count': len(text)
+        }
+        
+        # Create chunks
+        chunks = self.chunk_text(text, metadata)
+        
+        return {
+            'filename': file_path.name,
+            'file_path': str(file_path),
+            'file_type': file_path.suffix,
+            'file_size': file_stats.st_size,
+            'text': text,
+            'chunks': chunks,
+            'metadata': metadata
+        }
+
+class ChunkProcessor:
+    """Advanced chunking strategies."""
+    
+    @staticmethod
+    def semantic_chunk(text: str, chunk_size: int = 1000) -> List[Dict[str, Any]]:
+        """Semantic chunking based on content similarity."""
+        # This is a simplified version - in practice, you'd use embeddings
+        # to find semantically similar sentences and group them together
+        
+        sentences = re.split(r'(?<=[.!?])\s+', text)
+        chunks = []
+        current_chunk = []
+        current_length = 0
+        
+        for sentence in sentences:
+            sentence = sentence.strip()
+            if not sentence:
+                continue
+                
+            sentence_length = len(sentence)
+            
+            if current_length + sentence_length > chunk_size and current_chunk:
+                chunks.append({
+                    'content': ' '.join(current_chunk),
+                    'length': current_length
+                })
+                current_chunk = [sentence]
+                current_length = sentence_length
+            else:
+                current_chunk.append(sentence)
+                current_length += sentence_length
+        
+        if current_chunk:
+            chunks.append({
+                'content': ' '.join(current_chunk),
+                'length': current_length
+            })
+        
+        return chunks
+    
+    @staticmethod
+    def paragraph_chunk(text: str, chunk_size: int = 1000) -> List[Dict[str, Any]]:
+        """Chunk by paragraphs."""
+        paragraphs = text.split('\n\n')
+        chunks = []
+        current_chunk = []
+        current_length = 0
+        
+        for paragraph in paragraphs:
+            paragraph = paragraph.strip()
+            if not paragraph:
+                continue
+                
+            paragraph_length = len(paragraph)
+            
+            if current_length + paragraph_length > chunk_size and current_chunk:
+                chunks.append({
+                    'content': '\n\n'.join(current_chunk),
+                    'length': current_length
+                })
+                current_chunk = [paragraph]
+                current_length = paragraph_length
+            else:
+                current_chunk.append(paragraph)
+                current_length += paragraph_length
+        
+        if current_chunk:
+            chunks.append({
+                'content': '\n\n'.join(current_chunk),
+                'length': current_length
+            })
+        
+        return chunks

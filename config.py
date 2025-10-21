@@ -1,61 +1,68 @@
-"""Configuration settings for the RAG Q&A application."""
+"""Configuration settings for the RAG Q&A App."""
 
 import os
 from pathlib import Path
-from typing import List, Optional
+from typing import Dict, Any
 
 class Config:
     """Application configuration."""
     
-    # Database settings
-    DATABASE_URL = "sqlite:///./rag_app.db"
-    VECTOR_DB_PATH = "./vector_db"
+    # Ollama settings
+    OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
+    EMBEDDING_MODEL = "nomic-embed-text:latest"
+    CHAT_MODEL = "qwen2.5:latest"
     
-    # Model settings
-    EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
-    CHUNK_SIZE = 512
+    # Vector store settings
+    VECTOR_DB_PATH = "vector_store.db"
+    FAISS_INDEX_PATH = "faiss_index.bin"
+    EMBEDDING_DIMENSION = 768  # nomic-embed-text dimension
+    
+    # Document processing
+    SUPPORTED_EXTENSIONS = {'.md', '.txt', '.pdf', '.docx'}
+    CHUNK_SIZE = 250
     CHUNK_OVERLAP = 50
     
     # Retrieval settings
-    TOP_K = 5
+    TOP_K = 3
     SIMILARITY_THRESHOLD = 0.7
     
-    # Generation settings
-    MAX_TOKENS = 512
-    TEMPERATURE = 0.7
+    # Guardrails
+    PII_PATTERNS = {
+        'email': r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b',
+        'phone': r'\b\d{3}-\d{3}-\d{4}\b|\b\(\d{3}\)\s*\d{3}-\d{4}\b',
+        'ssn': r'\b\d{3}-\d{2}-\d{4}\b'
+    }
     
-    # Security settings
-    ENABLE_GUARDRAILS = True
-    PII_REDACTION = True
+    # Evaluation
+    EVAL_CONFIG_PATH = "eval.yaml"
+    EVAL_REPORT_PATH = "eval_report.json"
     
-    # Evaluation settings
-    EVAL_FILE = "eval.yaml"
-    EVAL_OUTPUT = "eval_report.json"
-    
-    # Logging settings
+    # Logging
     LOG_LEVEL = "INFO"
-    LOG_FILE = "rag_app.log"
+    LOG_FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     
-    # Cost tracking
-    ENABLE_COST_TRACKING = True
-    PROMPT_CACHE_SIZE = 100
-    
-    # Supported file types
-    SUPPORTED_EXTENSIONS = [".md", ".txt", ".pdf", ".docx"]
-    
-    # Sample corpus directory
-    SAMPLE_CORPUS_DIR = "./sample_corpus"
+    # UI settings
+    STREAMLIT_PORT = 8501
+    STREAMLIT_HOST = "localhost"
     
     @classmethod
-    def get_embedding_dim(cls) -> int:
-        """Get embedding dimension for the selected model."""
-        return 384  # all-MiniLM-L6-v2 dimension
+    def get_data_dir(cls) -> Path:
+        """Get the data directory path."""
+        data_dir = Path("data")
+        data_dir.mkdir(exist_ok=True)
+        return data_dir
     
+    # @classmethod
+    # def get_sample_corpus_dir(cls) -> Path:
+    #     """Get the sample corpus directory path."""
+    #     corpus_dir = Path("sample_corpus")
+    #     corpus_dir.mkdir(exist_ok=True)
+    #     return corpus_dir
+
     @classmethod
-    def get_model_costs(cls) -> dict:
-        """Get estimated costs per token for different models."""
-        return {
-            "gpt-3.5-turbo": {"input": 0.0015, "output": 0.002},
-            "gpt-4": {"input": 0.03, "output": 0.06},
-            "local": {"input": 0.0, "output": 0.0}
-        }
+    def get_sample_corpus_dir(cls) -> Path:
+        """Get absolute path to sample corpus directory."""
+        base_dir = Path(__file__).resolve().parent
+        corpus_dir = base_dir / "sample_corpus"
+        corpus_dir.mkdir(exist_ok=True)
+        return corpus_dir
